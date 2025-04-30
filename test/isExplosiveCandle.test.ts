@@ -1,6 +1,6 @@
 import { DEFAULT_EXPLOSIVE_THRESHOLD } from "../constants";
 import { isExplosiveCandle } from "../lib";
-import { explosiveCandle, zeroRangeCandle, indecisiveCandle } from '../data';
+import { explosiveCandle, zeroRangeCandle, indecisiveCandle, negativeCandle } from '../data';
 import { Candle } from "../types";
 
 describe("isExplosiveCandle", () => {
@@ -22,13 +22,6 @@ describe("isExplosiveCandle", () => {
     });
 
     it("should handle candles with negative body-to-range ratio gracefully", () => {
-        const candle: Candle = {
-            open: 150,
-            close: 100,
-            high: 160,
-            low: 90,
-            timestamp: ""
-        };
-        expect(isExplosiveCandle(candle, DEFAULT_EXPLOSIVE_THRESHOLD)).toBe(true);
+        expect(isExplosiveCandle(negativeCandle, DEFAULT_EXPLOSIVE_THRESHOLD)).toBe(true);
     });
 });

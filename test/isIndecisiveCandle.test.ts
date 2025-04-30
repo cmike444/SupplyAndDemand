@@ -1,7 +1,6 @@
 import { DEFAULT_DECISIVE_THRESHOLD } from "../constants";
 import { isIndecisiveCandle } from "../lib";
-import { indecisiveCandle, explosiveCandle, zeroRangeCandle } from '../data';
-import { Candle } from "../types";
+import { indecisiveCandle, explosiveCandle, zeroRangeCandle, negativeCandle } from '../data';
 
 describe("isIndecisiveCandle", () => {
 
@@ -22,13 +21,6 @@ describe("isIndecisiveCandle", () => {
     });
 
     it("should handle candles with negative body-to-range ratio gracefully", () => {
-        const candle: Candle = {
-            open: 150,
-            close: 100,
-            high: 160,
-            low: 90,
-            timestamp: ""
-        };
-        expect(isIndecisiveCandle(candle, DEFAULT_DECISIVE_THRESHOLD)).toBe(false);
+        expect(isIndecisiveCandle(negativeCandle, DEFAULT_DECISIVE_THRESHOLD)).toBe(false);
     });
 });
