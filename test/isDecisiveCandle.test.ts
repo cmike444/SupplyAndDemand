@@ -1,4 +1,4 @@
-import { isDecisiveCandle } from '../lib/isDecisiveCandle';
+import { isDecisiveCandle } from '../lib';
 import { explosiveCandle, decisiveCandle, indecisiveCandle } from '../data';
 
 
