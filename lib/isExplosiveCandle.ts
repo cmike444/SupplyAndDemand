@@ -13,6 +13,7 @@ import { candleRange } from "./candleRange";
  *                    above which the candle is considered explosive.
  * @returns `true` if the candle's body-to-range ratio exceeds the threshold, otherwise `false`.
  * @todo: Use Average True Range (ATR) to determine if the candle is significantly larger than previous candles.
+ * @todo: Use candle's Relative Volume (RVOL) to increase confidence abour institutional activity.
  */
 export function isExplosiveCandle(candle: Candle, threshold: number = DEFAULT_EXPLOSIVE_THRESHOLD): boolean {
     return candleBody(candle) / candleRange(candle) > threshold;
