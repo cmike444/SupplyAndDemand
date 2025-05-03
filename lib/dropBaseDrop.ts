@@ -1,4 +1,5 @@
-import { Candle, SupplyZone, ZONE_DIRECTION, ZONE_TYPE } from '../types';
+import { Candle, SupplyZone } from '../types';
+import { ZONE_DIRECTION, ZONE_TYPE } from '../enums';
 import { MAX_BASE_CANDLES, MIN_BASE_CANDLES, MIN_ZONE_CANDLES } from '../constants';
 import { isBearishDecisiveCandle } from './isBearishDecisiveCandle';
 import { isIndecisiveCandle } from './isIndecisiveCandle';
