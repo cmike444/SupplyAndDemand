@@ -8,6 +8,6 @@ export interface Candle {
     close: number;
     high: number;
     low: number;
-    timestamp: string;
+    timestamp: number;
     volume?: number;
 }
