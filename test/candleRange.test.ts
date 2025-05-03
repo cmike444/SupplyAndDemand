@@ -1,9 +1,9 @@
 import { candleRange } from "../lib/candleRange";
-import { decisiveCandle, negativeCandle, zeroRangeCandle } from "../data";
+import { bullishDecisiveCandle, negativeCandle, zeroRangeCandle } from "../data";
 
 describe("candleRange", () => {
   it("should calculate the difference between high and low prices", () => {
-    expect(candleRange(decisiveCandle)).toBe(7);
+    expect(candleRange(bullishDecisiveCandle)).toBe(7);
   });
 
   it("should return 0 if high and low prices are the same", () => {

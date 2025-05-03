@@ -1,17 +1,17 @@
 import { Candle } from "../types";
-import { isBullish } from "./isBullishCandle";
+import { isBullishCandle } from "./isBullishCandle";
 import { isDecisiveCandle } from "./isDecisiveCandle";
 
 /**
  * Determines if a given candle is both bullish and decisive.
  *
  * A candle is considered bullish if it meets the criteria defined
- * in the `isBullish` function, and decisive if it meets the criteria
+ * in the `isBullishCandle` function, and decisive if it meets the criteria
  * defined in the `isDecisiveCandle` function.
  *
  * @param candle - The candle object to evaluate.
  * @returns `true` if the candle is both bullish and decisive, otherwise `false`.
  */
 export function isBullishDecisiveCandle(candle: Candle): boolean {
-    return isDecisiveCandle(candle) && isBullish(candle);
+    return isDecisiveCandle(candle) && isBullishCandle(candle);
 }

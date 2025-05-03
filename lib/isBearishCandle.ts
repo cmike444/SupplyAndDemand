@@ -7,6 +7,6 @@ import { Candle } from "../types";
  * @param candle - The candlestick object containing `open` and `close` properties.
  * @returns `true` if the candlestick is bearish, otherwise `false`.
  */
-export function isBearish(candle: Candle): boolean {
+export function isBearishCandle(candle: Candle): boolean {
     return candle.close < candle.open;
 }

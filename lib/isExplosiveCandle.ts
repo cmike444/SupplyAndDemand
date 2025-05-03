@@ -16,5 +16,6 @@ import { candleRange } from "./candleRange";
  * @todo: Use candle's Relative Volume (RVOL) to increase confidence abour institutional activity.
  */
 export function isExplosiveCandle(candle: Candle, threshold: number = DEFAULT_EXPLOSIVE_THRESHOLD): boolean {
+    if (candleBody(candle) === 0) return false;
     return candleBody(candle) / candleRange(candle) > threshold;
 };

@@ -1,17 +1,20 @@
 import { DEFAULT_DECISIVE_THRESHOLD } from "../constants";
 import { Candle } from "../types";
 import { candleBody } from "./candleBody";
+import { candleRange } from "./candleRange";
 
 /**
- * Determines if a given candle is decisive based on its body size.
+ * Determines if a candlestick is "decisive" based on its body-to-range ratio.
  *
- * A candle is considered decisive if its body size exceeds the specified threshold.
+ * A candle is considered decisive if:
+ * - The body size is greater than zero
+ * - The body-to-range ratio exceeds the specified threshold
  *
- * @param candle - The candle object to evaluate.
- * @param threshold - The minimum body size required for the candle to be considered decisive.
- *                     Defaults to `DEFAULT_DECISIVE_THRESHOLD`.
- * @returns `true` if the candle's body size is greater than the threshold, otherwise `false`.
+ * @param candle - An object representing a candlestick, containing `open`, `close`, `high`, and `low` properties.
+ * @param threshold - The minimum body-to-range ratio for a candle to be considered decisive (default: 0.5).
+ * @returns True if the candle is decisive, false otherwise.
  */
 export function isDecisiveCandle(candle: Candle, threshold: number = DEFAULT_DECISIVE_THRESHOLD): boolean {
-    return candleBody(candle) > threshold;
+    if (candleBody(candle) === 0) return false;
+    return candleBody(candle) / candleRange(candle) > threshold;
 };

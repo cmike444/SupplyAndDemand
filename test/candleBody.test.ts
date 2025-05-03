@@ -1,9 +1,9 @@
 import { candleBody } from "../lib";
-import { decisiveCandle, negativeCandle, zeroRangeCandle } from "../data";
+import { bullishDecisiveCandle, negativeCandle, zeroRangeCandle } from "../data";
 
 describe("candleBody", () => {
   it("should calculate the absolute difference between close and open prices", () => {
-    expect(candleBody(decisiveCandle)).toBe(5.5);
+    expect(candleBody(bullishDecisiveCandle)).toBe(5.5);
   });
 
   it("should return a positive value even if close is less than open", () => {

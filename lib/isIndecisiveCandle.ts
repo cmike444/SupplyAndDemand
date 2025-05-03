@@ -14,5 +14,6 @@ import { candleBody } from './candleBody';
  * @returns `true` if the candle is indecisive, otherwise `false`.
  */
 export function isIndecisiveCandle(candle: Candle, threshold: number = DEFAULT_DECISIVE_THRESHOLD): boolean {
-    return candleBody(candle) / candleRange(candle) <= threshold;
+    if (candleBody(candle) === 0) return true;
+    return (candleBody(candle) / candleRange(candle)) <= threshold;
 };

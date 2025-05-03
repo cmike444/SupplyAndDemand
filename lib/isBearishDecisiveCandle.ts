@@ -1,5 +1,5 @@
 import { Candle } from "../types";
-import { isBearish } from "./isBearishCandle";
+import { isBearishCandle } from "./isBearishCandle";
 import { isDecisiveCandle } from "./isDecisiveCandle";
 
 /**
@@ -12,5 +12,5 @@ import { isDecisiveCandle } from "./isDecisiveCandle";
  * @returns `true` if the candle is bearish and decisive, otherwise `false`.
  */
 export function isBearishDecisiveCandle(candle: Candle): boolean {
-    return isDecisiveCandle(candle) && isBearish(candle);
+    return isDecisiveCandle(candle) && isBearishCandle(candle);
 }

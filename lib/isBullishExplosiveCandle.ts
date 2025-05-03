@@ -1,5 +1,5 @@
 import { Candle } from "../types";
-import { isBullish } from "./isBullishCandle";
+import { isBullishCandle } from "./isBullishCandle";
 import { isExplosiveCandle } from "./isExplosiveCandle";
 
 /**
@@ -12,5 +12,5 @@ import { isExplosiveCandle } from "./isExplosiveCandle";
  * @returns `true` if the candle is both explosive and bullish, otherwise `false`.
  */
 export function isBullishExplosiveCandle(candle: Candle): boolean {
-    return isExplosiveCandle(candle) && isBullish(candle);
+    return isExplosiveCandle(candle) && isBullishCandle(candle);
 }
