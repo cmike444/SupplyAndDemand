@@ -1,11 +1,25 @@
 {
+  "name": "@cmike444/supply-and-demand-zones",
+  "version": "1.0.0",
+  "description": "A library for identifying supply and demand zones in candlestick data.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "identify-zones": "ts-node scripts/identifyZonesFromFile.ts",
+    "convert-to-candle": "ts-node scripts/convertToCandle.ts"
+  },
+  "keywords": ["supply", "demand", "zones", "candlestick", "trading"],
+  "author": "Christopher Mikelson",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
-    "ts-jest": "^29.3.2"
-  },
-  "scripts": {
-    "identify-zones": "ts-node scripts/identifyZonesFromFile.ts",
-    "convert-to-candle": "ts-node scripts/convertToCandle.ts"
+    "ts-jest": "^29.3.2",
+    "typescript": "^5.0.0"
   }
 }
