@@ -11,7 +11,8 @@
     "build": "tsc",
     "test": "jest",
     "identify-zones": "ts-node scripts/identifyZonesFromFile.ts",
-    "convert-to-candle": "ts-node scripts/convertToCandle.ts"
+    "convert-to-candle": "ts-node scripts/convertToCandle.ts",
+    "version": "git add . && git commit -m 'Release v$npm_package_version' && git tag v$npm_package_version"
   },
   "keywords": ["supply", "demand", "zones", "candlestick", "trading"],
   "author": "Christopher Mikelson",
