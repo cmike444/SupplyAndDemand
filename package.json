@@ -21,6 +21,7 @@
     "type": "git",
     "url": "https://github.com/chrismikelson/SupplyAndDemand.git"
   },
+  "private": false,
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
