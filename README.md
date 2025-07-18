@@ -11,6 +11,7 @@ A TypeScript library for identifying supply and demand zones in candlestick data
   - Determining bullish, bearish, decisive, and indecisive candles.
   - Detecting explosive candles.
 - Fully written in TypeScript with type definitions for strong typing.
+- Includes enums and constants for candlestick analysis.
 
 ## Installation
 
@@ -24,10 +25,10 @@ npm install supply-and-demand-zones
 
 ### Importing the Library
 
-You can import the library functions into your project:
+You can import the library functions, types, and constants into your project:
 
 ```typescript
-import { identifyZones, candleBody, isBullishCandle } from 'supply-and-demand-zones';
+import { identifyZones, candleBody, isBullishCandle, CandleType, DEFAULT_THRESHOLD } from 'supply-and-demand-zones';
 ```
 
 ### Example: Identifying Supply and Demand Zones
@@ -74,9 +75,36 @@ const candle = { timestamp: 1, open: 100, high: 110, low: 95, close: 105 };
 console.log('Is Decisive:', isDecisiveCandle(candle)); // Output depends on the threshold
 ```
 
+#### Detect Explosive Candles
+```typescript
+import { isExplosiveCandle } from 'supply-and-demand-zones';
+
+const candle = { timestamp: 1, open: 100, high: 150, low: 95, close: 145 };
+console.log('Is Explosive:', isExplosiveCandle(candle)); // Output: true
+```
+
+### Example: Using Enums and Constants
+
+#### Candle Types
+```typescript
+import { CandleType } from 'supply-and-demand-zones';
+
+console.log(CandleType.Bullish); // Output: 'Bullish'
+console.log(CandleType.Bearish); // Output: 'Bearish'
+```
+
+#### Default Threshold
+```typescript
+import { DEFAULT_THRESHOLD } from 'supply-and-demand-zones';
+
+console.log('Default Threshold:', DEFAULT_THRESHOLD); // Output: 0.5
+```
+
 ## API Reference
 
-### `identifyZones(candles: Candle[]): { supplyZones: SupplyZone[], demandZones: DemandZone[] }`
+### Functions
+
+#### `identifyZones(candles: Candle[]): { supplyZones: SupplyZone[], demandZones: DemandZone[] }`
 Identifies supply and demand zones in an array of candlestick data.
 
 - **Parameters**:
@@ -84,9 +112,7 @@ Identifies supply and demand zones in an array of candlestick data.
 - **Returns**:
   - An object containing `supplyZones` and `demandZones`.
 
----
-
-### `candleBody(candle: Candle): number`
+#### `candleBody(candle: Candle): number`
 Calculates the body size of a candlestick.
 
 - **Parameters**:
@@ -94,9 +120,7 @@ Calculates the body size of a candlestick.
 - **Returns**:
   - The absolute difference between the `close` and `open` prices.
 
----
-
-### `isBullishCandle(candle: Candle): boolean`
+#### `isBullishCandle(candle: Candle): boolean`
 Determines if a candlestick is bullish.
 
 - **Parameters**:
@@ -104,9 +128,7 @@ Determines if a candlestick is bullish.
 - **Returns**:
   - `true` if the `close` price is greater than the `open` price, otherwise `false`.
 
----
-
-### `isDecisiveCandle(candle: Candle, threshold?: number): boolean`
+#### `isDecisiveCandle(candle: Candle, threshold?: number): boolean`
 Determines if a candlestick is decisive based on a threshold.
 
 - **Parameters**:
@@ -115,7 +137,57 @@ Determines if a candlestick is decisive based on a threshold.
 - **Returns**:
   - `true` if the body size exceeds the threshold, otherwise `false`.
 
----
+#### `isExplosiveCandle(candle: Candle): boolean`
+Determines if a candlestick is explosive based on its range.
+
+- **Parameters**:
+  - `candle`: A `Candle` object.
+- **Returns**:
+  - `true` if the range exceeds a predefined threshold, otherwise `false`.
+
+### Types
+
+#### `Candle`
+Represents a single candlestick.
+
+- **Properties**:
+  - `timestamp`: The time of the candlestick.
+  - `open`: The opening price.
+  - `high`: The highest price.
+  - `low`: The lowest price.
+  - `close`: The closing price.
+
+#### `SupplyZone`
+Represents a supply zone.
+
+- **Properties**:
+  - `start`: The starting timestamp of the zone.
+  - `end`: The ending timestamp of the zone.
+  - `priceRange`: The price range of the zone.
+
+#### `DemandZone`
+Represents a demand zone.
+
+- **Properties**:
+  - `start`: The starting timestamp of the zone.
+  - `end`: The ending timestamp of the zone.
+  - `priceRange`: The price range of the zone.
+
+### Enums
+
+#### `CandleType`
+Defines the type of a candlestick.
+
+- **Values**:
+  - `Bullish`: Represents a bullish candlestick.
+  - `Bearish`: Represents a bearish candlestick.
+
+### Constants
+
+#### `DEFAULT_THRESHOLD`
+The default threshold for determining decisive candles.
+
+- **Value**: `0.5`
 
 ## Contributing
 
