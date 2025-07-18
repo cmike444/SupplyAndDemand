@@ -1,6 +1,6 @@
 {
   "name": "@cmike444/supply-and-demand-zones",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "type": "module",
   "description": "A library for identifying supply and demand zones in candlestick data.",
   "main": "dist/index.js",
