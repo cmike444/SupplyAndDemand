@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demand Zone Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/@cmike444/supply-and-demand-zones@1.0.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+</head>
+<body>
+    <h1>Demand Zone Visualization</h1>
+    <canvas id="demandZoneChart" width="800" height="400"></canvas>
+
+    <script>
+        // Example demand zone data
+        const demandZoneData = [
+            { timestamp: "2023-01-01T00:00:00Z", open: 100, high: 105, low: 98, close: 104 },
+            { timestamp: "2023-01-01T00:01:00Z", open: 104, high: 110, low: 103, close: 109 },
+            { timestamp: "2023-01-01T00:02:00Z", open: 109, high: 112, low: 108, close: 108.5 },
+            { timestamp: "2023-01-01T00:03:00Z", open: 108.5, high: 115, low: 108, close: 114 },
+        ];
+
+        // Prepare data for Chart.js
+        const chartData = demandZoneData.map(candle => ({
+            x: new Date(candle.timestamp),
+            o: candle.open,
+            h: candle.high,
+            l: candle.low,
+            c: candle.close,
+        }));
+
+        // Render the chart
+        const ctx = document.getElementById('demandZoneChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'candlestick',
+            data: {
+                datasets: [{
+                    label: 'Demand Zone Data',
+                    data: chartData,
+                    borderColor: 'rgba(54, 162, 235, 0.8)',
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Demand Zone Candlestick Chart'
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

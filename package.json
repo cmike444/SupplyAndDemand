@@ -1,6 +1,6 @@
 {
   "name": "@cmike444/supply-and-demand-zones",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "description": "A library for identifying supply and demand zones in candlestick data.",
   "main": "dist/index.js",
@@ -15,7 +15,13 @@
     "convert-to-candle": "ts-node scripts/convertToCandle.ts",
     "version": "git add . && git commit -m 'Release v$npm_package_version' && git tag v$npm_package_version"
   },
-  "keywords": ["supply", "demand", "zones", "candlestick", "trading"],
+  "keywords": [
+    "supply",
+    "demand",
+    "zones",
+    "candlestick",
+    "trading"
+  ],
   "author": "Christopher Mikelson",
   "license": "MIT",
   "repository": {
