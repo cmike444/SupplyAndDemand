@@ -16,6 +16,7 @@ logs/
 # Build outputs
 build/
 out/
+dist/
 
 # Dependency directories
 jspm_packages/

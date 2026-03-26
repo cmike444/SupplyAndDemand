@@ -14,5 +14,4 @@ import { Zone } from './Zone';
 export interface SupplyZone extends Zone {
     direction: ZONE_DIRECTION.SUPPLY;
     type: ZONE_TYPE.RALLY_BASE_DROP | ZONE_TYPE.DROP_BASE_DROP;
-    confidence?: number;
 }

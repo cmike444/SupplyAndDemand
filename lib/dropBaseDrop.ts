@@ -25,8 +25,8 @@ export function dropBaseDrop(candles: Candle[]): SupplyZone | null {
     if (baseCandleCount < MIN_BASE_CANDLES) return null;
 
     // Identify the second drop
-    const dropStartIndex = findPatternEnd(candles, baseEndIndex, isBearishExplosiveCandle);
-    if (dropStartIndex === baseEndIndex) return null;
+    const dropZoneStartIndex = findPatternEnd(candles, baseEndIndex, isBearishExplosiveCandle);
+    if (dropZoneStartIndex === baseEndIndex) return null;
 
     // Return the identified drop-base-drop pattern as a SupplyZone
     const baseCandles = candles.slice(dropEndIndex, baseEndIndex);
@@ -37,6 +37,6 @@ export function dropBaseDrop(candles: Candle[]): SupplyZone | null {
         proximalLine: Math.min(...baseCandles.map(c => c.low)),
         distalLine: Math.max(...baseCandles.map(c => c.high)),
         startTimestamp: candles[0].timestamp,
-        endTimestamp: candles[dropStartIndex - 1].timestamp,
+        endTimestamp: candles[dropZoneStartIndex - 1].timestamp,
     };
 };

@@ -25,8 +25,8 @@ export function dropBaseRally(candles: Candle[]): DemandZone | null {
     if (baseCandleCount < MIN_BASE_CANDLES) return null;
 
     // Identify the rally
-    const rallyStartIndex = findPatternEnd(candles, baseEndIndex, isBullishExplosiveCandle);
-    if (rallyStartIndex === baseEndIndex) return null;
+    const rallyZoneStartIndex = findPatternEnd(candles, baseEndIndex, isBullishExplosiveCandle);
+    if (rallyZoneStartIndex === baseEndIndex) return null;
 
     // Return the identified drop-base-rally pattern as a DemandZone
     const baseCandles = candles.slice(dropEndIndex, baseEndIndex);
@@ -37,6 +37,6 @@ export function dropBaseRally(candles: Candle[]): DemandZone | null {
         proximalLine: Math.max(...baseCandles.map(c => c.high)),
         distalLine: Math.min(...baseCandles.map(c => c.low)),
         startTimestamp: candles[0].timestamp,
-        endTimestamp: candles[rallyStartIndex - 1].timestamp,
+        endTimestamp: candles[rallyZoneStartIndex - 1].timestamp,
     };
 };

@@ -1,3 +1,5 @@
+import { Candle } from './Candle';
+
 /**
  * Represents a Zone with specific boundaries and time range.
  *
