@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Case Visualizations</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: sans-serif; background: #0f0f1a; color: #ddd; margin: 0; padding: 24px; }
+        h1 { margin: 0 0 4px; font-size: 1.4em; }
+        .meta { color: #888; font-size: 0.85em; margin-bottom: 28px; }
+        section { margin-bottom: 36px; }
+        h2 { font-size: 1em; font-weight: 600; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+        .dir { font-size: 0.75em; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+        .supply-dir { background: rgba(255,99,132,0.2); color: rgba(255,99,132,1); border: 1px solid rgba(255,99,132,0.4); }
+        .demand-dir { background: rgba(75,192,75,0.2); color: rgba(100,220,100,1); border: 1px solid rgba(75,192,75,0.4); }
+        .both-dir   { background: rgba(150,150,255,0.2); color: rgba(180,180,255,1); border: 1px solid rgba(150,150,255,0.4); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+        .card { background: #1a1a2e; border: 1px solid #2a2a45; border-radius: 8px; padding: 12px; }
+        .card.muted { opacity: 0.6; }
+        .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+        .case-title { font-size: 0.8em; color: #ccc; line-height: 1.3; }
+        .badge { font-size: 0.7em; white-space: nowrap; padding: 2px 7px; border-radius: 10px; font-weight: 600; margin-top: 1px; }
+        .badge.zone-found { background: rgba(75,192,75,0.2); color: rgba(100,220,100,1); border: 1px solid rgba(75,192,75,0.4); }
+        .badge.no-zone { background: rgba(150,150,150,0.15); color: #888; border: 1px solid rgba(150,150,150,0.3); }
+        .empty-chart { height: 80px; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.8em; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>Test Case Visualizations</h1>
+    <p class="meta">31 test cases &nbsp;|&nbsp; 13 with zones found &nbsp;|&nbsp; 18 expected null</p>
+
+    
+    <section>
+        <h2>Drop → Base → Drop <span class="dir supply-dir">Supply</span></h2>
+        <div class="card-grid">
+            
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Too short (5 candles) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-0" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bearish decisive start → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-1" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Base too short (1 candle) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-2" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bearish explosive end → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-3" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Valid drop-base-drop ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-4" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Custom base: proximal=116, distal=126 ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-5" height="160"></canvas>
+        </div>
+        </div>
+    </section>
+    <section>
+        <h2>Drop → Base → Rally <span class="dir demand-dir">Demand</span></h2>
+        <div class="card-grid">
+            
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Too short (5 candles) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-6" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bearish decisive start → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-7" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Base too short (1 candle) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-8" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bullish explosive end → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-9" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Valid drop-base-rally ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-10" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Custom base: proximal=126, distal=116 ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-11" height="160"></canvas>
+        </div>
+        </div>
+    </section>
+    <section>
+        <h2>Rally → Base → Drop <span class="dir supply-dir">Supply</span></h2>
+        <div class="card-grid">
+            
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Too short (5 candles) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-12" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bullish decisive start → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-13" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Base too short (1 candle) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-14" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bearish explosive end → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-15" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Valid rally-base-drop ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-16" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Custom base: proximal=96, distal=108 ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-17" height="160"></canvas>
+        </div>
+        </div>
+    </section>
+    <section>
+        <h2>Rally → Base → Rally <span class="dir demand-dir">Demand</span></h2>
+        <div class="card-grid">
+            
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Too short (5 candles) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-18" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bullish decisive start → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-19" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Base too short (1 candle) → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-20" height="160"></canvas>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">No bullish explosive end → null</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-21" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Valid rally-base-rally ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-22" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">Custom base: proximal=108, distal=96 ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-23" height="160"></canvas>
+        </div>
+        </div>
+    </section>
+    <section>
+        <h2>identifyZones (combined) <span class="dir both-dir">Supply + Demand</span></h2>
+        <div class="card-grid">
+            
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">Empty candle list → no zones</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <div class="empty-chart">Empty candle array</div>
+        </div>
+        <div class="card muted">
+            <div class="card-header">
+                <span class="case-title">All indecisive → no zones</span>
+                <span class="badge no-zone">no zone</span>
+            </div>
+            <canvas id="chart-25" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">drop-base-drop supply zone ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-26" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">drop-base-rally demand zone ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-27" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">rally-base-drop supply zone ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-28" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">rally-base-rally demand zone ✓</span>
+                <span class="badge zone-found">1 zone found</span>
+            </div>
+            <canvas id="chart-29" height="160"></canvas>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="case-title">DBD supply + DBR demand in sequence ✓</span>
+                <span class="badge zone-found">2 zones found</span>
+            </div>
+            <canvas id="chart-30" height="160"></canvas>
+        </div>
+        </div>
+    </section>
+
+    <script>
+        const cases = [{"group":"dropBaseDrop","title":"Too short (5 candles) → null","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":118,"l":94,"c":95}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseDrop","title":"No bearish decisive start → null","chartData":[{"x":86400000,"o":119,"h":121,"l":116,"c":118},{"x":172800000,"o":118,"h":120,"l":117,"c":119},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":118,"l":94,"c":95},{"x":518400000,"o":96,"h":97,"l":74,"c":75}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseDrop","title":"Base too short (1 candle) → null","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":117,"h":118,"l":94,"c":95},{"x":432000000,"o":96,"h":97,"l":74,"c":75},{"x":518400000,"o":96,"h":97,"l":74,"c":75}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseDrop","title":"No bearish explosive end → null","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":119,"h":121,"l":116,"c":118},{"x":518400000,"o":118,"h":120,"l":117,"c":119}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseDrop","title":"Valid drop-base-drop ✓","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":118,"l":94,"c":95},{"x":518400000,"o":96,"h":97,"l":74,"c":75}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":116,"yMax":121,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgba(255, 99, 132, 0.9)","borderWidth":1,"label":{"display":true,"content":"S1","position":"start","color":"rgba(255, 99, 132, 1)","font":{"size":9}}}],"supplyCount":1,"demandCount":0},{"group":"dropBaseDrop","title":"Custom base: proximal=116, distal=126 ✓","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":120,"h":126,"l":119,"c":121},{"x":345600000,"o":121,"h":124,"l":116,"c":120},{"x":432000000,"o":117,"h":118,"l":94,"c":95},{"x":518400000,"o":96,"h":97,"l":74,"c":75}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":116,"yMax":126,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgba(255, 99, 132, 0.9)","borderWidth":1,"label":{"display":true,"content":"S1","position":"start","color":"rgba(255, 99, 132, 1)","font":{"size":9}}}],"supplyCount":1,"demandCount":0},{"group":"dropBaseRally","title":"Too short (5 candles) → null","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":140,"l":116,"c":138}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseRally","title":"No bearish decisive start → null","chartData":[{"x":86400000,"o":119,"h":121,"l":116,"c":118},{"x":172800000,"o":118,"h":120,"l":117,"c":119},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":140,"l":116,"c":138},{"x":518400000,"o":138,"h":160,"l":137,"c":158}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseRally","title":"Base too short (1 candle) → null","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":117,"h":140,"l":116,"c":138},{"x":432000000,"o":138,"h":160,"l":137,"c":158},{"x":518400000,"o":138,"h":160,"l":137,"c":158}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseRally","title":"No bullish explosive end → null","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":119,"h":121,"l":116,"c":118},{"x":518400000,"o":118,"h":120,"l":117,"c":119}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"dropBaseRally","title":"Valid drop-base-rally ✓","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":140,"l":116,"c":138},{"x":518400000,"o":138,"h":160,"l":137,"c":158}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":121,"yMax":116,"backgroundColor":"rgba(75, 192, 75, 0.2)","borderColor":"rgba(75, 192, 75, 0.9)","borderWidth":1,"label":{"display":true,"content":"D1","position":"start","color":"rgba(75, 192, 75, 1)","font":{"size":9}}}],"supplyCount":0,"demandCount":1},{"group":"dropBaseRally","title":"Custom base: proximal=126, distal=116 ✓","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":120,"h":126,"l":119,"c":121},{"x":345600000,"o":121,"h":124,"l":116,"c":120},{"x":432000000,"o":117,"h":140,"l":116,"c":138},{"x":518400000,"o":138,"h":160,"l":137,"c":158}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":126,"yMax":116,"backgroundColor":"rgba(75, 192, 75, 0.2)","borderColor":"rgba(75, 192, 75, 0.9)","borderWidth":1,"label":{"display":true,"content":"D1","position":"start","color":"rgba(75, 192, 75, 1)","font":{"size":9}}}],"supplyCount":0,"demandCount":1},{"group":"rallyBaseDrop","title":"Too short (5 candles) → null","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":118,"l":90,"c":91}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseDrop","title":"No bullish decisive start → null","chartData":[{"x":86400000,"o":115,"h":117,"l":112,"c":114},{"x":172800000,"o":114,"h":116,"l":113,"c":115},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":118,"l":90,"c":91},{"x":518400000,"o":92,"h":93,"l":69,"c":70}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseDrop","title":"Base too short (1 candle) → null","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":116,"h":118,"l":90,"c":91},{"x":432000000,"o":92,"h":93,"l":69,"c":70},{"x":518400000,"o":92,"h":93,"l":69,"c":70}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseDrop","title":"No bearish explosive end → null","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":115,"h":117,"l":112,"c":114},{"x":518400000,"o":114,"h":116,"l":113,"c":115}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseDrop","title":"Valid rally-base-drop ✓","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":118,"l":90,"c":91},{"x":518400000,"o":92,"h":93,"l":69,"c":70}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":112,"yMax":117,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgba(255, 99, 132, 0.9)","borderWidth":1,"label":{"display":true,"content":"S1","position":"start","color":"rgba(255, 99, 132, 1)","font":{"size":9}}}],"supplyCount":1,"demandCount":0},{"group":"rallyBaseDrop","title":"Custom base: proximal=96, distal=108 ✓","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":101,"h":108,"l":100,"c":102},{"x":345600000,"o":102,"h":105,"l":96,"c":103},{"x":432000000,"o":116,"h":118,"l":90,"c":91},{"x":518400000,"o":92,"h":93,"l":69,"c":70}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":96,"yMax":108,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgba(255, 99, 132, 0.9)","borderWidth":1,"label":{"display":true,"content":"S1","position":"start","color":"rgba(255, 99, 132, 1)","font":{"size":9}}}],"supplyCount":1,"demandCount":0},{"group":"rallyBaseRally","title":"Too short (5 candles) → null","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":143,"l":115,"c":141}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseRally","title":"No bullish decisive start → null","chartData":[{"x":86400000,"o":115,"h":117,"l":112,"c":114},{"x":172800000,"o":114,"h":116,"l":113,"c":115},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":143,"l":115,"c":141},{"x":518400000,"o":140,"h":165,"l":139,"c":163}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseRally","title":"Base too short (1 candle) → null","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":116,"h":143,"l":115,"c":141},{"x":432000000,"o":140,"h":165,"l":139,"c":163},{"x":518400000,"o":140,"h":165,"l":139,"c":163}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseRally","title":"No bullish explosive end → null","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":115,"h":117,"l":112,"c":114},{"x":518400000,"o":114,"h":116,"l":113,"c":115}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"rallyBaseRally","title":"Valid rally-base-rally ✓","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":143,"l":115,"c":141},{"x":518400000,"o":140,"h":165,"l":139,"c":163}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":117,"yMax":112,"backgroundColor":"rgba(75, 192, 75, 0.2)","borderColor":"rgba(75, 192, 75, 0.9)","borderWidth":1,"label":{"display":true,"content":"D1","position":"start","color":"rgba(75, 192, 75, 1)","font":{"size":9}}}],"supplyCount":0,"demandCount":1},{"group":"rallyBaseRally","title":"Custom base: proximal=108, distal=96 ✓","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":101,"h":108,"l":100,"c":102},{"x":345600000,"o":102,"h":105,"l":96,"c":103},{"x":432000000,"o":116,"h":143,"l":115,"c":141},{"x":518400000,"o":140,"h":165,"l":139,"c":163}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":108,"yMax":96,"backgroundColor":"rgba(75, 192, 75, 0.2)","borderColor":"rgba(75, 192, 75, 0.9)","borderWidth":1,"label":{"display":true,"content":"D1","position":"start","color":"rgba(75, 192, 75, 1)","font":{"size":9}}}],"supplyCount":0,"demandCount":1},{"group":"identifyZones","title":"Empty candle list → no zones","chartData":[],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"identifyZones","title":"All indecisive → no zones","chartData":[{"x":86400000,"o":119,"h":121,"l":116,"c":118},{"x":172800000,"o":119,"h":121,"l":116,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":119,"h":121,"l":116,"c":118},{"x":432000000,"o":119,"h":121,"l":116,"c":118},{"x":518400000,"o":119,"h":121,"l":116,"c":118}],"annotations":[],"supplyCount":0,"demandCount":0},{"group":"identifyZones","title":"drop-base-drop supply zone ✓","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":118,"l":94,"c":95},{"x":518400000,"o":96,"h":97,"l":74,"c":75}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":116,"yMax":121,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgba(255, 99, 132, 0.9)","borderWidth":1,"label":{"display":true,"content":"S1","position":"start","color":"rgba(255, 99, 132, 1)","font":{"size":9}}}],"supplyCount":1,"demandCount":0},{"group":"identifyZones","title":"drop-base-rally demand zone ✓","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":140,"l":116,"c":138},{"x":518400000,"o":138,"h":160,"l":137,"c":158}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":121,"yMax":116,"backgroundColor":"rgba(75, 192, 75, 0.2)","borderColor":"rgba(75, 192, 75, 0.9)","borderWidth":1,"label":{"display":true,"content":"D1","position":"start","color":"rgba(75, 192, 75, 1)","font":{"size":9}}}],"supplyCount":0,"demandCount":1},{"group":"identifyZones","title":"rally-base-drop supply zone ✓","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":118,"l":90,"c":91},{"x":518400000,"o":92,"h":93,"l":69,"c":70}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":112,"yMax":117,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgba(255, 99, 132, 0.9)","borderWidth":1,"label":{"display":true,"content":"S1","position":"start","color":"rgba(255, 99, 132, 1)","font":{"size":9}}}],"supplyCount":1,"demandCount":0},{"group":"identifyZones","title":"rally-base-rally demand zone ✓","chartData":[{"x":86400000,"o":82,"h":104,"l":78,"c":98},{"x":172800000,"o":97,"h":118,"l":93,"c":114},{"x":259200000,"o":115,"h":117,"l":112,"c":114},{"x":345600000,"o":114,"h":116,"l":113,"c":115},{"x":432000000,"o":116,"h":143,"l":115,"c":141},{"x":518400000,"o":140,"h":165,"l":139,"c":163}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":117,"yMax":112,"backgroundColor":"rgba(75, 192, 75, 0.2)","borderColor":"rgba(75, 192, 75, 0.9)","borderWidth":1,"label":{"display":true,"content":"D1","position":"start","color":"rgba(75, 192, 75, 1)","font":{"size":9}}}],"supplyCount":0,"demandCount":1},{"group":"identifyZones","title":"DBD supply + DBR demand in sequence ✓","chartData":[{"x":86400000,"o":150,"h":152,"l":126,"c":132},{"x":172800000,"o":133,"h":135,"l":112,"c":118},{"x":259200000,"o":119,"h":121,"l":116,"c":118},{"x":345600000,"o":118,"h":120,"l":117,"c":119},{"x":432000000,"o":117,"h":118,"l":94,"c":95},{"x":518400000,"o":96,"h":97,"l":74,"c":75},{"x":604800000,"o":150,"h":152,"l":126,"c":132},{"x":691200000,"o":133,"h":135,"l":112,"c":118},{"x":777600000,"o":119,"h":121,"l":116,"c":118},{"x":864000000,"o":118,"h":120,"l":117,"c":119},{"x":950400000,"o":117,"h":140,"l":116,"c":138},{"x":1036800000,"o":138,"h":160,"l":137,"c":158}],"annotations":[{"type":"box","xMin":86400000,"xMax":518400000,"yMin":116,"yMax":121,"backgroundColor":"rgba(255, 99, 132, 0.2)","borderColor":"rgba(255, 99, 132, 0.9)","borderWidth":1,"label":{"display":true,"content":"S1","position":"start","color":"rgba(255, 99, 132, 1)","font":{"size":9}}},{"type":"box","xMin":604800000,"xMax":1036800000,"yMin":121,"yMax":116,"backgroundColor":"rgba(75, 192, 75, 0.2)","borderColor":"rgba(75, 192, 75, 0.9)","borderWidth":1,"label":{"display":true,"content":"D1","position":"start","color":"rgba(75, 192, 75, 1)","font":{"size":9}}}],"supplyCount":1,"demandCount":1}];
+
+        cases.forEach((c, i) => {
+            if (c.chartData.length === 0) return;
+            const canvas = document.getElementById('chart-' + i);
+            if (!canvas) return;
+
+            new Chart(canvas, {
+                type: 'candlestick',
+                data: {
+                    datasets: [{
+                        label: 'Price',
+                        data: c.chartData,
+                        color: {
+                            up:        'rgba(75,  192,  75, 1)',
+                            down:      'rgba(255,  99, 132, 1)',
+                            unchanged: 'rgba(200, 200, 200, 1)',
+                        },
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        annotation: { annotations: c.annotations },
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'day', displayFormats: { day: 'd' } },
+                            ticks: { color: '#666', maxRotation: 0 },
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                        },
+                        y: {
+                            ticks: { color: '#666', font: { size: 10 } },
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                        },
+                    },
+                },
+            });
+        });
+    </script>
+</body>
+</html>

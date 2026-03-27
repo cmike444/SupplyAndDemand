@@ -2,48 +2,54 @@ import { rallyBaseRally } from '../lib';
 import { Candle } from '../types';
 import { ZONE_DIRECTION, ZONE_TYPE } from '../enums';
 
-// body=6, range=11, ratio≈0.545 → decisive (>0.5), NOT explosive (≤0.7), bullish
-const bullishDecisive = (ts: number): Candle => ({ open: 100, close: 106, high: 110, low: 99, timestamp: ts });
-// body=2, range=11, ratio≈0.182 → indecisive (≤0.5)
-const indecisive = (ts: number): Candle => ({ open: 100, close: 102, high: 110, low: 99, timestamp: ts });
-// body=9, range=11, ratio≈0.818 → explosive (>0.7), bullish
-const bullishExplosive = (ts: number): Candle => ({ open: 100, close: 109, high: 110, low: 99, timestamp: ts });
+// Rally 1 of 2: open:82→close:98, body=16, range=26, ratio=0.615 → decisive bullish
+const bullishDecisive1 = (ts: number): Candle => ({ open: 82, close: 98, high: 104, low: 78, timestamp: ts });
+// Rally 2 of 2: opens near prior close (97), closes at 114: body=17, range=25, ratio=0.68 → decisive bullish
+const bullishDecisive2 = (ts: number): Candle => ({ open: 97, close: 114, high: 118, low: 93, timestamp: ts });
+// Base 1 of 2: tight ~112–117 consolidation, body=1, range=5, ratio=0.2 → indecisive
+const indecisive1 = (ts: number): Candle => ({ open: 115, close: 114, high: 117, low: 112, timestamp: ts });
+// Base 2 of 2: opens near prior close (114), body=1, range=3, ratio=0.333 → indecisive
+const indecisive2 = (ts: number): Candle => ({ open: 114, close: 115, high: 116, low: 113, timestamp: ts });
+// Explosive rally 1 of 2: opens near base high (116), body=25, range=28, ratio=0.893 → explosive bullish
+const bullishExplosive1 = (ts: number): Candle => ({ open: 116, close: 141, high: 143, low: 115, timestamp: ts });
+// Explosive rally 2 of 2: opens near prior close (140), body=23, range=26, ratio=0.885 → explosive bullish
+const bullishExplosive2 = (ts: number): Candle => ({ open: 140, close: 163, high: 165, low: 139, timestamp: ts });
 
 describe('rallyBaseRally', () => {
     it('returns null for arrays shorter than MIN_ZONE_CANDLES', () => {
-        const candles = [bullishDecisive(1), bullishDecisive(2), indecisive(3), indecisive(4), bullishExplosive(5)];
+        const candles = [bullishDecisive1(1), bullishDecisive2(2), indecisive1(3), indecisive2(4), bullishExplosive1(5)];
         expect(rallyBaseRally(candles)).toBeNull();
     });
 
     it('returns null when the sequence does not begin with a bullish decisive candle', () => {
-        const candles = [indecisive(1), indecisive(2), indecisive(3), indecisive(4), bullishExplosive(5), bullishExplosive(6)];
+        const candles = [indecisive1(1), indecisive2(2), indecisive1(3), indecisive2(4), bullishExplosive1(5), bullishExplosive2(6)];
         expect(rallyBaseRally(candles)).toBeNull();
     });
 
     it('returns null when the base is shorter than MIN_BASE_CANDLES', () => {
-        const candles = [bullishDecisive(1), bullishDecisive(2), indecisive(3), bullishExplosive(4), bullishExplosive(5), bullishExplosive(6)];
+        const candles = [bullishDecisive1(1), bullishDecisive2(2), indecisive1(3), bullishExplosive1(4), bullishExplosive2(5), bullishExplosive2(6)];
         expect(rallyBaseRally(candles)).toBeNull();
     });
 
     it('returns null when no bullish explosive candle follows the base', () => {
-        const candles = [bullishDecisive(1), bullishDecisive(2), indecisive(3), indecisive(4), indecisive(5), indecisive(6)];
+        const candles = [bullishDecisive1(1), bullishDecisive2(2), indecisive1(3), indecisive2(4), indecisive1(5), indecisive2(6)];
         expect(rallyBaseRally(candles)).toBeNull();
     });
 
     it('returns a DemandZone for a valid rally-base-rally pattern', () => {
         const candles = [
-            bullishDecisive(1), bullishDecisive(2),
-            indecisive(3), indecisive(4),
-            bullishExplosive(5), bullishExplosive(6),
+            bullishDecisive1(1), bullishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bullishExplosive1(5), bullishExplosive2(6),
         ];
         expect(rallyBaseRally(candles)).not.toBeNull();
     });
 
     it('sets direction to DEMAND and type to RALLY_BASE_RALLY', () => {
         const candles = [
-            bullishDecisive(1), bullishDecisive(2),
-            indecisive(3), indecisive(4),
-            bullishExplosive(5), bullishExplosive(6),
+            bullishDecisive1(1), bullishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bullishExplosive1(5), bullishExplosive2(6),
         ];
         const zone = rallyBaseRally(candles)!;
         expect(zone.direction).toBe(ZONE_DIRECTION.DEMAND);
@@ -51,24 +57,24 @@ describe('rallyBaseRally', () => {
     });
 
     it('sets proximalLine to the maximum high of the base candles', () => {
-        const base1: Candle = { open: 100, close: 102, high: 112, low: 97, timestamp: 3 };
-        const base2: Candle = { open: 100, close: 101, high: 108, low: 99, timestamp: 4 };
-        const candles = [bullishDecisive(1), bullishDecisive(2), base1, base2, bullishExplosive(5), bullishExplosive(6)];
-        expect(rallyBaseRally(candles)!.proximalLine).toBe(112);
+        const base1: Candle = { open: 101, close: 102, high: 108, low: 100, timestamp: 3 };
+        const base2: Candle = { open: 102, close: 103, high: 104, low: 101, timestamp: 4 };
+        const candles = [bullishDecisive1(1), bullishDecisive2(2), base1, base2, bullishExplosive1(5), bullishExplosive2(6)];
+        expect(rallyBaseRally(candles)!.proximalLine).toBe(108);
     });
 
     it('sets distalLine to the minimum low of the base candles', () => {
-        const base1: Candle = { open: 100, close: 102, high: 112, low: 97, timestamp: 3 };
-        const base2: Candle = { open: 100, close: 101, high: 108, low: 99, timestamp: 4 };
-        const candles = [bullishDecisive(1), bullishDecisive(2), base1, base2, bullishExplosive(5), bullishExplosive(6)];
-        expect(rallyBaseRally(candles)!.distalLine).toBe(97);
+        const base1: Candle = { open: 101, close: 102, high: 105, low: 96, timestamp: 3 };
+        const base2: Candle = { open: 102, close: 103, high: 104, low: 100, timestamp: 4 };
+        const candles = [bullishDecisive1(1), bullishDecisive2(2), base1, base2, bullishExplosive1(5), bullishExplosive2(6)];
+        expect(rallyBaseRally(candles)!.distalLine).toBe(96);
     });
 
     it('sets startTimestamp to the first candle and endTimestamp to the last candle of the pattern', () => {
         const candles = [
-            bullishDecisive(1), bullishDecisive(2),
-            indecisive(3), indecisive(4),
-            bullishExplosive(5), bullishExplosive(6),
+            bullishDecisive1(1), bullishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bullishExplosive1(5), bullishExplosive2(6),
         ];
         const zone = rallyBaseRally(candles)!;
         expect(zone.startTimestamp).toBe(1);
