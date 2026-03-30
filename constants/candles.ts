@@ -50,14 +50,23 @@ export const MIN_ZONE_CANDLES = Math.max(MIN_DROP_CANDLES, MIN_RALLY_CANDLES)*2 
 export const DEFAULT_ATR_PERIOD = 14;
 
 /**
+ * The default lookback period for Relative Volume (RVOL) calculation.
+ * RVOL = current bar's volume / mean volume of the prior N bars.
+ */
+export const DEFAULT_RVOL_PERIOD = 20;
+
+
+
+/**
  * The maximum allowed base height expressed as a multiple of ATR.
  * A base whose high-to-low range exceeds this multiple is rejected as too wide.
  */
 export const MAX_ZONE_ATR_MULTIPLIER = 1.5;
 
 /**
- * The maximum allowed gap between consecutive candles in the base, expressed as
- * a multiple of ATR. A gap larger than this indicates a price discontinuity that
- * invalidates the base.
+ * The maximum allowed gap between consecutive candles *within* the base, expressed as
+ * a multiple of ATR. A gap larger than this between base candles indicates a price
+ * discontinuity that invalidates the base. The gap from the preceding explosive candle
+ * into the first base candle is intentionally not checked here.
  */
 export const MAX_BASE_GAP_ATR_MULTIPLIER = 0.5;
