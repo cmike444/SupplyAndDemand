@@ -80,4 +80,16 @@ describe('dropBaseDrop', () => {
         expect(zone.startTimestamp).toBe(1);
         expect(zone.endTimestamp).toBe(6);
     });
+
+    it('sets confidence to a number in [0, 1] for a valid pattern', () => {
+        const candles = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const zone = dropBaseDrop(candles)!;
+        expect(typeof zone.confidence).toBe('number');
+        expect(zone.confidence).toBeGreaterThanOrEqual(0);
+        expect(zone.confidence).toBeLessThanOrEqual(1);
+    });
 });
