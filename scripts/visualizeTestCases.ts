@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { identifyZones } from '../lib/identifyZones';
 import { Candle, SupplyZone, DemandZone } from '../types';
+import { buildNavSidebar } from './navSidebar';
 
 const outputPath = process.argv[2] ?? path.resolve(__dirname, '../example/testCases.html');
 
@@ -348,6 +349,11 @@ const groupSections = groups.map(group => {
     </section>`;
 }).join('');
 
+const { css: navCss, html: navHtml, js: navJs } = buildNavSidebar(
+    path.dirname(outputPath),
+    path.basename(outputPath),
+);
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -378,9 +384,11 @@ const html = `<!DOCTYPE html>
         .badge.zone-found { background: rgba(75,192,75,0.2); color: rgba(100,220,100,1); border: 1px solid rgba(75,192,75,0.4); }
         .badge.no-zone { background: rgba(150,150,150,0.15); color: #888; border: 1px solid rgba(150,150,150,0.3); }
         .empty-chart { height: 80px; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.8em; font-style: italic; }
+        ${navCss}
     </style>
 </head>
 <body>
+    ${navHtml}
     <h1>Test Case Visualizations</h1>
     <p class="meta">${totalCases} test cases &nbsp;|&nbsp; ${totalFound} with zones found &nbsp;|&nbsp; ${totalCases - totalFound} expected null</p>
 
@@ -428,6 +436,8 @@ const html = `<!DOCTYPE html>
                 },
             });
         });
+    </script>
+    <script>${navJs}
     </script>
 </body>
 </html>`;

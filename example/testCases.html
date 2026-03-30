@@ -28,9 +28,81 @@
         .badge.zone-found { background: rgba(75,192,75,0.2); color: rgba(100,220,100,1); border: 1px solid rgba(75,192,75,0.4); }
         .badge.no-zone { background: rgba(150,150,150,0.15); color: #888; border: 1px solid rgba(150,150,150,0.3); }
         .empty-chart { height: 80px; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.8em; font-style: italic; }
+        
+        /* ── sidebar navigation ─────────────────────────────────────────── */
+        body > h1 { margin-left: 44px; }
+        #nav-toggle {
+            position: fixed; top: 14px; left: 14px; z-index: 1001;
+            background: none; border: none; color: #888;
+            width: 36px; height: 36px; font-size: 20px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            line-height: 1; padding: 0;
+            transition: color 0.15s;
+        }
+        #nav-toggle:hover { color: #fff; }
+        #nav-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 1002;
+            background: rgba(0,0,0,0.45);
+        }
+        #nav-backdrop.open { display: block; }
+        #nav-sidebar {
+            position: fixed; left: 0; top: 0; height: 100%; width: 260px;
+            z-index: 1003; background: #0f0f1f; border-right: 1px solid #2a2a3e;
+            box-shadow: 2px 0 16px rgba(0,0,0,0.6);
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        #nav-sidebar.open { transform: translateX(0); }
+        #nav-header {
+            padding: 16px 16px 12px; font-size: 0.75em; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase; color: #666;
+            border-bottom: 1px solid #1e1e30; flex-shrink: 0;
+        }
+        #nav-list {
+            list-style: none; margin: 0; padding: 8px 0;
+            overflow-y: auto; flex: 1;
+        }
+        #nav-list::-webkit-scrollbar { width: 4px; }
+        #nav-list::-webkit-scrollbar-track { background: transparent; }
+        #nav-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        .nav-link {
+            display: block; padding: 8px 16px; font-size: 0.82em; color: #999;
+            text-decoration: none; line-height: 1.4;
+            transition: background 0.12s, color 0.12s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: #ddd; }
+        .nav-item--active .nav-link {
+            background: rgba(100,100,200,0.22); color: #c8c8ff; font-weight: 600;
+            border-left: 3px solid rgba(120,120,220,0.8); padding-left: 13px;
+        }
     </style>
 </head>
 <body>
+    
+    <button id="nav-toggle" title="Browse example files">&#9776;</button>
+    <div id="nav-backdrop"></div>
+    <nav id="nav-sidebar" role="navigation" aria-label="Example files">
+        <div id="nav-header">Example Files</div>
+        <ul id="nav-list">
+        <li><a class="nav-link" href="./AAPL_1d_20250331_20260327_zones.html">AAPL · 1d · Mar 31, 2025 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./AAPL_1m_20260319_20260327_zones.html">AAPL · 1m · Mar 19, 2026 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./AAPL_1m_20260323_20260327_zones.html">AAPL · 1m · Mar 23, 2026 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./AAPL_5m_20260302_20260327_zones.html">AAPL · 5m · Mar 2, 2026 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./AAPL_60m_20250331_20260327_zones.html">AAPL · 60m · Mar 31, 2025 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./IBIT_15m_20251231_20260327_zones.html">IBIT · 15m · Dec 31, 2025 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./IBIT_1d_20250328_20260327_zones.html">IBIT · 1d · Mar 28, 2025 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./IBIT_1m_20260319_20260327_zones.html">IBIT · 1m · Mar 19, 2026 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./IBIT_60m_20250328_20260327_zones.html">IBIT · 60m · Mar 28, 2025 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./SPX_Candles_zones.html">SPX Candles Zones</a></li>
+        <li><a class="nav-link" href="./SPY_1m_20260319_20260327_zones.html">SPY · 1m · Mar 19, 2026 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./SPY_5m_20251231_20260327_zones.html">SPY · 5m · Dec 31, 2025 – Mar 27, 2026</a></li>
+        <li><a class="nav-link" href="./demandZone.html">DemandZone</a></li>
+        <li><a class="nav-link" href="./supplyZone.html">SupplyZone</a></li>
+        <li class="nav-item--active"><a class="nav-link" href="./testCases.html">Test Cases</a></li>
+        <li><a class="nav-link" href="./zones.html">Zones</a></li>
+        </ul>
+    </nav>
     <h1>Test Case Visualizations</h1>
     <p class="meta">31 test cases &nbsp;|&nbsp; 13 with zones found &nbsp;|&nbsp; 18 expected null</p>
 
@@ -325,6 +397,22 @@
                 },
             });
         });
+    </script>
+    <script>
+    (function () {
+        var toggle   = document.getElementById('nav-toggle');
+        var sidebar  = document.getElementById('nav-sidebar');
+        var backdrop = document.getElementById('nav-backdrop');
+        function openNav()  { sidebar.classList.add('open'); backdrop.classList.add('open'); }
+        function closeNav() { sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+        toggle.addEventListener('click', function () {
+            sidebar.classList.contains('open') ? closeNav() : openNav();
+        });
+        backdrop.addEventListener('click', closeNav);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeNav();
+        });
+    })();
     </script>
 </body>
 </html>
