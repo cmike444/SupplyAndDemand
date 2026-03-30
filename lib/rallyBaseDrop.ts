@@ -7,6 +7,7 @@ import { findPatternEnd } from './findPatternEnd';
 import { isBearishExplosiveCandle } from './isBearishExplosiveCandle';
 import { isBullishCandle } from './isBullishCandle';
 import { isValidBase } from './isValidBase';
+import { calculateConfidence } from './calculateConfidence';
 
 /**
  * Identifies a rally-base-drop pattern in a series of candlestick data.
@@ -38,6 +39,7 @@ export function rallyBaseDrop(candles: Candle[], localATR: number = 0): SupplyZo
     const firstDropCandle = candles[baseEndIndex];
     if (firstDropCandle && isBullishCandle(firstDropCandle)) return null;
 
+    const departureCandles = candles.slice(baseEndIndex, dropZoneStartIndex);
     return {
         direction: ZONE_DIRECTION.SUPPLY,
         type: ZONE_TYPE.RALLY_BASE_DROP,
@@ -45,5 +47,6 @@ export function rallyBaseDrop(candles: Candle[], localATR: number = 0): SupplyZo
         distalLine: Math.max(...baseCandles.map(c => c.high)),
         startTimestamp: candles[0].timestamp,
         endTimestamp: candles[dropZoneStartIndex - 1].timestamp,
+        confidence: calculateConfidence(departureCandles, baseCandles, localATR, false),
     };
 };
