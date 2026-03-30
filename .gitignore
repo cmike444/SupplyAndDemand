@@ -17,6 +17,7 @@ logs/
 build/
 out/
 dist/
+data/*.json
 
 # Dependency directories
 jspm_packages/
@@ -36,3 +37,4 @@ jspm_packages/
 # Miscellaneous
 .DS_Store
 Thumbs.db
+example/

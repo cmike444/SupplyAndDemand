@@ -12,6 +12,7 @@
     "test": "jest",
     "identify-zones": "ts-node scripts/identifyZonesFromFile.ts",
     "convert-to-candle": "ts-node scripts/convertToCandle.ts",
+    "fetch-candles": "npx ts-node scripts/fetch_candles.ts",
     "visualize-zones": "npx ts-node scripts/visualizeZones.ts",
     "visualize-tests": "npx ts-node scripts/visualizeTestCases.ts",
     "version": "git add . && git commit -m 'Release v$npm_package_version' && git tag v$npm_package_version"
@@ -35,6 +36,7 @@
     "@types/node": "^25.5.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.3.2",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "yahoo-finance2": "^3.14.0"
   }
 }
