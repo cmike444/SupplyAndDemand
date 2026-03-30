@@ -1,4 +1,6 @@
 import { Candle, SupplyZone, DemandZone } from '../types';
+import { DEFAULT_ATR_PERIOD } from '../constants';
+import { atr } from './atr';
 import { rallyBaseDrop } from './rallyBaseDrop';
 import { dropBaseDrop } from './dropBaseDrop';
 import { dropBaseRally } from './dropBaseRally';
@@ -16,8 +18,9 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
 
     for (let i = 0; i < candles.length; i++) {
         const remainingCandles = candles.slice(i);
+        const localATR = atr(candles.slice(Math.max(0, i - DEFAULT_ATR_PERIOD), i));
 
-        const rallyBaseDropZone = rallyBaseDrop(remainingCandles);
+        const rallyBaseDropZone = rallyBaseDrop(remainingCandles, localATR);
         if (rallyBaseDropZone) {
             supplyZones.push(rallyBaseDropZone);
             const endIdx = remainingCandles.findIndex(c => c.timestamp === rallyBaseDropZone.endTimestamp);
@@ -25,7 +28,7 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
             continue;
         }
 
-        const dropBaseDropZone = dropBaseDrop(remainingCandles);
+        const dropBaseDropZone = dropBaseDrop(remainingCandles, localATR);
         if (dropBaseDropZone) {
             supplyZones.push(dropBaseDropZone);
             const endIdx = remainingCandles.findIndex(c => c.timestamp === dropBaseDropZone.endTimestamp);
@@ -33,7 +36,7 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
             continue;
         }
 
-        const dropBaseRallyZone = dropBaseRally(remainingCandles);
+        const dropBaseRallyZone = dropBaseRally(remainingCandles, localATR);
         if (dropBaseRallyZone) {
             demandZones.push(dropBaseRallyZone);
             const endIdx = remainingCandles.findIndex(c => c.timestamp === dropBaseRallyZone.endTimestamp);
@@ -41,7 +44,7 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
             continue;
         }
 
-        const rallyBaseRallyZone = rallyBaseRally(remainingCandles);
+        const rallyBaseRallyZone = rallyBaseRally(remainingCandles, localATR);
         if (rallyBaseRallyZone) {
             demandZones.push(rallyBaseRallyZone);
             const endIdx = remainingCandles.findIndex(c => c.timestamp === rallyBaseRallyZone.endTimestamp);

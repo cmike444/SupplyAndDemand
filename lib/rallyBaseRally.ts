@@ -5,6 +5,8 @@ import { isBullishDecisiveCandle } from './isBullishDecisiveCandle';
 import { isIndecisiveCandle } from './isIndecisiveCandle';
 import { findPatternEnd } from './findPatternEnd';
 import { isBullishExplosiveCandle } from './isBullishExplosiveCandle';
+import { isBearishCandle } from './isBearishCandle';
+import { isValidBase } from './isValidBase';
 
 /**
  * Identifies a rally-base-rally pattern in a series of candlestick data.
@@ -12,7 +14,7 @@ import { isBullishExplosiveCandle } from './isBullishExplosiveCandle';
  * @param candles - Array of Candle objects to evaluate.
  * @returns A DemandZone object if the pattern is identified, otherwise `null`.
  */
-export function rallyBaseRally(candles: Candle[]): DemandZone | null {
+export function rallyBaseRally(candles: Candle[], localATR: number = 0): DemandZone | null {
     if (candles.length < MIN_ZONE_CANDLES) return null;
 
     // Identify the rally
@@ -30,6 +32,11 @@ export function rallyBaseRally(candles: Candle[]): DemandZone | null {
 
     // Return the identified rally-base-rally pattern as a DemandZone
     const baseCandles = candles.slice(rallyEndIndex, baseEndIndex);
+    if (!isValidBase(baseCandles, candles[rallyEndIndex - 1], localATR)) return null;
+
+    // Follow-through check: first candle of the second rally (after the base) must not be bearish
+    const firstRallyCandle = candles[baseEndIndex];
+    if (firstRallyCandle && isBearishCandle(firstRallyCandle)) return null;
 
     return {
         direction: ZONE_DIRECTION.DEMAND,

@@ -42,3 +42,22 @@ export const MAX_BASE_CANDLES = 8;
  * This constant is used to ensure that a zone is formed with sufficient data points.
  */
 export const MIN_ZONE_CANDLES = Math.max(MIN_DROP_CANDLES, MIN_RALLY_CANDLES)*2 + MIN_BASE_CANDLES;
+
+/**
+ * The default period used for ATR (Average True Range) calculation.
+ * ATR(14) is Wilder's industry-standard, timeframe-agnostic volatility measure.
+ */
+export const DEFAULT_ATR_PERIOD = 14;
+
+/**
+ * The maximum allowed base height expressed as a multiple of ATR.
+ * A base whose high-to-low range exceeds this multiple is rejected as too wide.
+ */
+export const MAX_ZONE_ATR_MULTIPLIER = 1.5;
+
+/**
+ * The maximum allowed gap between consecutive candles in the base, expressed as
+ * a multiple of ATR. A gap larger than this indicates a price discontinuity that
+ * invalidates the base.
+ */
+export const MAX_BASE_GAP_ATR_MULTIPLIER = 0.5;

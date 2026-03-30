@@ -10,6 +10,8 @@ export * from './isDecisiveCandle';
 export * from './isExplosiveCandle';
 export * from './isIndecisiveCandle';
 export * from './findPatternEnd';
+export * from './atr';
+export * from './isValidBase';
 export * from './dropBaseDrop';
 export * from './dropBaseRally';
 export * from './rallyBaseDrop';

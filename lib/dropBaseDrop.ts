@@ -5,6 +5,8 @@ import { isBearishDecisiveCandle } from './isBearishDecisiveCandle';
 import { isIndecisiveCandle } from './isIndecisiveCandle';
 import { findPatternEnd } from './findPatternEnd';
 import { isBearishExplosiveCandle } from './isBearishExplosiveCandle';
+import { isBullishCandle } from './isBullishCandle';
+import { isValidBase } from './isValidBase';
 
 /**
  * Identifies a drop-base-drop pattern in a series of candlestick data.
@@ -12,7 +14,7 @@ import { isBearishExplosiveCandle } from './isBearishExplosiveCandle';
  * @param candles - Array of Candle objects to evaluate.
  * @returns A SupplyZone object if the pattern is identified, otherwise `null`.
  */
-export function dropBaseDrop(candles: Candle[]): SupplyZone | null {
+export function dropBaseDrop(candles: Candle[], localATR: number = 0): SupplyZone | null {
     if (candles.length < MIN_ZONE_CANDLES) return null;
 
     // Identify the first drop
@@ -30,6 +32,11 @@ export function dropBaseDrop(candles: Candle[]): SupplyZone | null {
 
     // Return the identified drop-base-drop pattern as a SupplyZone
     const baseCandles = candles.slice(dropEndIndex, baseEndIndex);
+    if (!isValidBase(baseCandles, candles[dropEndIndex - 1], localATR)) return null;
+
+    // Follow-through check: first candle of the second drop (after the base) must not be bullish
+    const firstDropCandle = candles[baseEndIndex];
+    if (firstDropCandle && isBullishCandle(firstDropCandle)) return null;
 
     return {
         direction: ZONE_DIRECTION.SUPPLY,
