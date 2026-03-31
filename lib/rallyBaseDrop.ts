@@ -1,11 +1,12 @@
 import { Candle, SupplyZone } from '../types';
 import { ZONE_DIRECTION, ZONE_TYPE } from '../enums';
-import { MAX_BASE_CANDLES, MIN_BASE_CANDLES, MIN_ZONE_CANDLES } from '../constants';
+import { DEFAULT_EXPLOSIVE_THRESHOLD, MAX_BASE_CANDLES, MIN_BASE_CANDLES, MIN_EXPLOSIVE_ATR_MULTIPLIER, MIN_ZONE_CANDLES } from '../constants';
 import { isBullishDecisiveCandle } from './isBullishDecisiveCandle';
 import { isIndecisiveCandle } from './isIndecisiveCandle';
 import { findPatternEnd } from './findPatternEnd';
-import { isBearishExplosiveCandle } from './isBearishExplosiveCandle';
+import { isBearishCandle } from './isBearishCandle';
 import { isBullishCandle } from './isBullishCandle';
+import { isExplosiveCandle } from './isExplosiveCandle';
 import { isValidBase } from './isValidBase';
 import { calculateConfidence } from './calculateConfidence';
 
@@ -27,8 +28,12 @@ export function rallyBaseDrop(candles: Candle[], localATR: number = 0): SupplyZo
     const baseCandleCount = baseEndIndex - rallyEndIndex;
     if (baseCandleCount < MIN_BASE_CANDLES) return null;
 
-    // Identify the drop
-    const dropZoneStartIndex = findPatternEnd(candles, baseEndIndex, isBearishExplosiveCandle);
+    // Identify the drop (ERC bearing down, with ATR magnitude check)
+    const dropZoneStartIndex = findPatternEnd(
+        candles,
+        baseEndIndex,
+        c => isExplosiveCandle(c, DEFAULT_EXPLOSIVE_THRESHOLD, MIN_EXPLOSIVE_ATR_MULTIPLIER * localATR) && isBearishCandle(c),
+    );
     if (dropZoneStartIndex === baseEndIndex) return null;
 
     // Return the identified rally-base-drop pattern as a SupplyZone
@@ -40,11 +45,12 @@ export function rallyBaseDrop(candles: Candle[], localATR: number = 0): SupplyZo
     if (firstDropCandle && isBullishCandle(firstDropCandle)) return null;
 
     const departureCandles = candles.slice(baseEndIndex, dropZoneStartIndex);
+    const fullFormation = candles.slice(0, dropZoneStartIndex);
     return {
         direction: ZONE_DIRECTION.SUPPLY,
         type: ZONE_TYPE.RALLY_BASE_DROP,
-        proximalLine: Math.min(...baseCandles.map(c => c.low)),
-        distalLine: Math.max(...baseCandles.map(c => c.high)),
+        proximalLine: Math.min(...baseCandles.map(c => Math.min(c.open, c.close))),
+        distalLine: Math.max(...fullFormation.map(c => c.high)),
         startTimestamp: candles[0].timestamp,
         endTimestamp: candles[dropZoneStartIndex - 1].timestamp,
         confidence: calculateConfidence(departureCandles, baseCandles, localATR, false),

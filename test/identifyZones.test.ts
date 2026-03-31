@@ -88,7 +88,9 @@ describe('identifyZones', () => {
         expect(supplyZones[0].startTimestamp).toBe(1);
         expect(supplyZones[0].endTimestamp).toBe(6);
         expect(demandZones[0].startTimestamp).toBe(7);
-        expect(demandZones[0].endTimestamp).toBe(12);
+        // Only the first bullish explosive candle (ts=11) meets the ATR magnitude check;
+        // the second (ts=12, range=23) falls below 1.5× local ATR ≈ 23.7.
+        expect(demandZones[0].endTimestamp).toBe(11);
     });
 
     it('identifies a rally-base-drop supply zone', () => {

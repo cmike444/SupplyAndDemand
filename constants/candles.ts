@@ -26,16 +26,16 @@ export const MIN_DROP_CANDLES = 2;
 
 /**
  * The minimum number of base candles required for a zone.
- * This constant ensures that at least one base candle is always present.
+ * Per spec: a base can consist of as few as 1 narrow-range candle.
  */
-export const MIN_BASE_CANDLES = 2;
+export const MIN_BASE_CANDLES = 1;
 
 /**
- * The maximum number of base candles required for a zone.
- * This constant is used to limit the number of candles that can be
- * processed or displayed at a time.
+ * The maximum number of base candles allowed for a zone.
+ * Per spec: more than 6 base candles indicates the imbalance is too
+ * dispersed and the zone should be ignored.
  */
-export const MAX_BASE_CANDLES = 8;
+export const MAX_BASE_CANDLES = 6;
 
 /**
  * The minimum number of candles required to define a zone.
@@ -70,3 +70,10 @@ export const MAX_ZONE_ATR_MULTIPLIER = 1.5;
  * into the first base candle is intentionally not checked here.
  */
 export const MAX_BASE_GAP_ATR_MULTIPLIER = 0.5;
+
+/**
+ * The minimum range of the leg-out (ERC) candle expressed as a multiple of ATR.
+ * Per spec §2.1: the leg-out range must be >= 1.5× ATR to confirm it is significantly
+ * larger than surrounding price action, indicating institutional activity.
+ */
+export const MIN_EXPLOSIVE_ATR_MULTIPLIER = 1.5;

@@ -40,39 +40,43 @@ describe('calculateConfidence', () => {
         // All bullish strong → countFactor = 1
         // No volume → volumeFactor = 0.5
         // avgRange=26, ATR=20 → rangeFactor = min(26/20, 1) = 1
-        // score = (1 + 1 + 0.5) / 3 ≈ 0.833
+        // base has 1 candle → timeFactor = 1.0
+        // score = (1 + 1 + 0.5 + 1) / 4 = 0.875
         const result = calculateConfidence(
             [bullishStrong(1), bullishStrong(2)],
             [weak(3)],
             ATR,
             true,
         );
-        expect(result).toBeCloseTo((1 + 1 + 0.5) / 3);
+        expect(result).toBeCloseTo((1 + 1 + 0.5 + 1) / 4);
     });
 
     it('countFactor is 0 when no departure candle is strong in the expected direction', () => {
         // weak candles used as departure — body ratio 0.1, not decisive or explosive
         // countFactor = 0, volumeFactor = 0.5 (no volume), rangeFactor = min(10/20,1) = 0.5
-        // score = (0 + 0.5 + 0.5) / 3 ≈ 0.333
+        // base has 1 candle → timeFactor = 1.0
+        // score = (0 + 0.5 + 0.5 + 1) / 4 = 0.5
         const result = calculateConfidence(
             [weak(1), weak(2)],
             [weak(3)],
             ATR,
             true,
         );
-        expect(result).toBeCloseTo((0 + 0.5 + 0.5) / 3);
+        expect(result).toBeCloseTo((0 + 0.5 + 0.5 + 1) / 4);
     });
 
     it('does not count bearish strong candles toward bullish countFactor', () => {
         // bearishStrong candles used in upward departure → they should NOT count as strong
+        // base has 1 candle → timeFactor = 1.0
         const result = calculateConfidence([bearishStrong(1)], [weak(2)], ATR, true);
         // countFactor = 0
-        expect(result).toBeCloseTo((0 + Math.min(26 / ATR, 1) + 0.5) / 3);
+        expect(result).toBeCloseTo((0 + Math.min(26 / ATR, 1) + 0.5 + 1) / 4);
     });
 
     it('does not count bullish strong candles toward bearish countFactor', () => {
+        // base has 1 candle → timeFactor = 1.0
         const result = calculateConfidence([bullishStrong(1)], [weak(2)], ATR, false);
-        expect(result).toBeCloseTo((0 + Math.min(26 / ATR, 1) + 0.5) / 3);
+        expect(result).toBeCloseTo((0 + Math.min(26 / ATR, 1) + 0.5 + 1) / 4);
     });
 
     // --- Range factor ---
@@ -80,43 +84,47 @@ describe('calculateConfidence', () => {
     it('rangeFactor falls back to 0.5 when localATR is 0', () => {
         // countFactor = 1 (all strong bullish), volumeFactor = 0.5 (no volume)
         // rangeFactor = 0.5 (fallback)
+        // base has 1 candle → timeFactor = 1.0
         const result = calculateConfidence([bullishStrong(1)], [weak(2)], 0, true);
-        expect(result).toBeCloseTo((1 + 0.5 + 0.5) / 3);
+        expect(result).toBeCloseTo((1 + 0.5 + 0.5 + 1) / 4);
     });
 
     it('rangeFactor is clamped to 1 when avg range greatly exceeds ATR', () => {
         // range=26, ATR=5 → 26/5 = 5.2, clamped to 1
+        // base has 1 candle → timeFactor = 1.0
         const result = calculateConfidence([bullishStrong(1)], [weak(2)], 5, true);
-        // countFactor=1, rangeFactor=1, volumeFactor=0.5
-        expect(result).toBeCloseTo((1 + 1 + 0.5) / 3);
+        // countFactor=1, rangeFactor=1, volumeFactor=0.5, timeFactor=1
+        expect(result).toBeCloseTo((1 + 1 + 0.5 + 1) / 4);
     });
 
     it('rangeFactor is proportional when avg range is less than ATR', () => {
         // weak candle range=10, ATR=40 → rangeFactor = 10/40 = 0.25
+        // base has 1 candle → timeFactor = 1.0
         const result = calculateConfidence([weak(1)], [weak(2)], 40, true);
-        // countFactor=0, rangeFactor=0.25, volumeFactor=0.5
-        expect(result).toBeCloseTo((0 + 0.25 + 0.5) / 3);
+        // countFactor=0, rangeFactor=0.25, volumeFactor=0.5, timeFactor=1
+        expect(result).toBeCloseTo((0 + 0.25 + 0.5 + 1) / 4);
     });
 
     // --- Volume factor ---
 
     it('volumeFactor falls back to 0.5 when no candle has volume', () => {
         const result = calculateConfidence([bullishStrong(1)], [weak(2)], ATR, true);
-        // volumeFactor must be exactly 0.5 — tested via the full formula
+        // volumeFactor must be exactly 0.5; base has 1 candle → timeFactor = 1.0
         const countFactor = 1;
         const rangeFactor = Math.min(26 / ATR, 1);
-        expect(result).toBeCloseTo((countFactor + rangeFactor + 0.5) / 3);
+        expect(result).toBeCloseTo((countFactor + rangeFactor + 0.5 + 1) / 4);
     });
 
     it('volumeFactor is 0.5 when departure volume equals base volume', () => {
         // ratio = 1 → 1/(1+1) = 0.5
+        // base has 1 candle → timeFactor = 1.0
         const departure = [bullishStrong(1, 100)];
         const base = [weak(2, 100)];
         const result = calculateConfidence(departure, base, ATR, true);
         const countFactor = 1;
         const rangeFactor = Math.min(26 / ATR, 1);
         const volumeFactor = 1 / 2; // 0.5
-        expect(result).toBeCloseTo((countFactor + rangeFactor + volumeFactor) / 3);
+        expect(result).toBeCloseTo((countFactor + rangeFactor + volumeFactor + 1) / 4);
     });
 
     it('volumeFactor increases as departure volume increases beyond base volume', () => {
@@ -135,11 +143,12 @@ describe('calculateConfidence', () => {
 
     it('volumeFactor falls back to 0.5 when base has no volume data', () => {
         // departure has volume but base does not — base avg = 0 → use fallback 0.5
+        // base has 1 candle → timeFactor = 1.0
         const departure = [bullishStrong(1, 200)];
         const base = [weak(2)]; // no volume
         const result = calculateConfidence(departure, base, ATR, true);
         const countFactor = 1;
         const rangeFactor = Math.min(26 / ATR, 1);
-        expect(result).toBeCloseTo((countFactor + rangeFactor + 0.5) / 3);
+        expect(result).toBeCloseTo((countFactor + rangeFactor + 0.5 + 1) / 4);
     });
 });

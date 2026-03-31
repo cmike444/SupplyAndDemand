@@ -1,11 +1,12 @@
 import { Candle, DemandZone } from '../types';
 import { ZONE_DIRECTION, ZONE_TYPE } from '../enums';
-import { MAX_BASE_CANDLES, MIN_BASE_CANDLES, MIN_ZONE_CANDLES } from '../constants';
+import { DEFAULT_EXPLOSIVE_THRESHOLD, MAX_BASE_CANDLES, MIN_BASE_CANDLES, MIN_EXPLOSIVE_ATR_MULTIPLIER, MIN_ZONE_CANDLES } from '../constants';
 import { isBullishDecisiveCandle } from './isBullishDecisiveCandle';
 import { isIndecisiveCandle } from './isIndecisiveCandle';
 import { findPatternEnd } from './findPatternEnd';
-import { isBullishExplosiveCandle } from './isBullishExplosiveCandle';
+import { isBullishCandle } from './isBullishCandle';
 import { isBearishCandle } from './isBearishCandle';
+import { isExplosiveCandle } from './isExplosiveCandle';
 import { isValidBase } from './isValidBase';
 import { calculateConfidence } from './calculateConfidence';
 
@@ -27,8 +28,12 @@ export function rallyBaseRally(candles: Candle[], localATR: number = 0): DemandZ
     const baseCandleCount = baseEndIndex - rallyEndIndex;
     if (baseCandleCount < MIN_BASE_CANDLES) return null;
 
-    // Identify the second rally
-    const rallyZoneStartIndex = findPatternEnd(candles, baseEndIndex, isBullishExplosiveCandle);
+    // Identify the second rally (ERC bullish departure, with ATR magnitude check)
+    const rallyZoneStartIndex = findPatternEnd(
+        candles,
+        baseEndIndex,
+        c => isExplosiveCandle(c, DEFAULT_EXPLOSIVE_THRESHOLD, MIN_EXPLOSIVE_ATR_MULTIPLIER * localATR) && isBullishCandle(c),
+    );
     if (rallyZoneStartIndex === baseEndIndex) return null;
 
     // Return the identified rally-base-rally pattern as a DemandZone
@@ -40,11 +45,12 @@ export function rallyBaseRally(candles: Candle[], localATR: number = 0): DemandZ
     if (firstRallyCandle && isBearishCandle(firstRallyCandle)) return null;
 
     const departureCandles = candles.slice(baseEndIndex, rallyZoneStartIndex);
+    const fullFormation = candles.slice(0, rallyZoneStartIndex);
     return {
         direction: ZONE_DIRECTION.DEMAND,
         type: ZONE_TYPE.RALLY_BASE_RALLY,
-        proximalLine: Math.max(...baseCandles.map(c => c.high)),
-        distalLine: Math.min(...baseCandles.map(c => c.low)),
+        proximalLine: Math.max(...baseCandles.map(c => Math.max(c.open, c.close))),
+        distalLine: Math.min(...fullFormation.map(c => c.low)),
         startTimestamp: candles[0].timestamp,
         endTimestamp: candles[rallyZoneStartIndex - 1].timestamp,
         confidence: calculateConfidence(departureCandles, baseCandles, localATR, true),

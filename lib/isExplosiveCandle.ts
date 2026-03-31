@@ -4,18 +4,21 @@ import { candleBody } from "./candleBody";
 import { candleRange } from "./candleRange";
 
 /**
- * Determines if a given candle is considered "explosive" based on its body-to-range ratio.
+ * Determines if a given candle is considered "explosive" based on its body-to-range ratio
+ * and, optionally, whether its total range is large enough relative to the local ATR.
  *
- * An explosive candle typically has a range abnormally larger than previous candles, indicating institutional activity.
+ * Per spec §2.1: the body must represent >= 70% of the total range, and the total range
+ * must be >= `minATR` (typically 1.5× ATR) to confirm the candle is the Leg-out (ERC).
  *
  * @param candle - The candle object containing the data to analyze.
- * @param threshold - The threshold ratio (default is `DEFAULT_EXPLOSIVE_THRESHOLD`) 
- *                    above which the candle is considered explosive.
- * @returns `true` if the candle's body-to-range ratio exceeds the threshold, otherwise `false`.
- * @todo: Use Average True Range (ATR) to determine if the candle is significantly larger than previous candles.
- * @todo: Use candle's Relative Volume (RVOL) to increase confidence abour institutional activity.
+ * @param threshold - The body/range ratio threshold (default `DEFAULT_EXPLOSIVE_THRESHOLD` = 0.70).
+ * @param minATR - Minimum required total range. When > 0, candles whose range falls below
+ *                 this value are rejected even if their body ratio qualifies. Pass 0 (default)
+ *                 to skip the ATR magnitude check.
+ * @returns `true` if the candle qualifies as an ERC, otherwise `false`.
  */
-export function isExplosiveCandle(candle: Candle, threshold: number = DEFAULT_EXPLOSIVE_THRESHOLD): boolean {
+export function isExplosiveCandle(candle: Candle, threshold: number = DEFAULT_EXPLOSIVE_THRESHOLD, minATR: number = 0): boolean {
     if (candleBody(candle) === 0) return false;
-    return candleBody(candle) / candleRange(candle) > threshold;
+    if (minATR > 0 && candleRange(candle) < minATR) return false;
+    return candleBody(candle) / candleRange(candle) >= threshold;
 };

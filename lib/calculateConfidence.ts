@@ -22,6 +22,9 @@ import { isBearishDecisiveCandle } from './isBearishDecisiveCandle';
  *   Sparse or declining departure volume scores below 0.5. Falls back to 0.5 when volume data is
  *   absent or base volume is zero.
  *
+ * - **timeFactor**: encodes the "Time at Level" odds-enhancer from the spec. Fewer base candles
+ *   imply a sharper, less-disputed imbalance. 1–3 candles → 1.0; 4–6 candles → 0.5.
+ *
  * @param departureCandles   - Candles forming the explosive leg away from the zone.
  * @param baseCandles        - Candles forming the indecisive base of the zone.
  * @param localATR           - ATR computed for the context window around the zone.
@@ -62,5 +65,10 @@ export function calculateConfidence(
         volumeFactor = ratio / (ratio + 1);
     }
 
-    return (countFactor + rangeFactor + volumeFactor) / 3;
+    // --- Time factor (Time at Level) ---
+    // Fewer base candles = sharper imbalance = higher institutional conviction.
+    const baseCount = baseCandles.length;
+    const timeFactor = baseCount <= 3 ? 1.0 : baseCount <= 6 ? 0.5 : 0;
+
+    return (countFactor + rangeFactor + volumeFactor + timeFactor) / 4;
 }

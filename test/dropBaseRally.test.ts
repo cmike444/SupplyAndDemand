@@ -17,7 +17,7 @@ const bullishExplosive2 = (ts: number): Candle => ({ open: 138, close: 158, high
 
 describe('dropBaseRally', () => {
     it('returns null for arrays shorter than MIN_ZONE_CANDLES', () => {
-        const candles = [bearishDecisive1(1), bearishDecisive2(2), indecisive1(3), indecisive2(4), bullishExplosive1(5)];
+        const candles = [bearishDecisive1(1), bearishDecisive2(2), indecisive1(3), indecisive2(4)];
         expect(dropBaseRally(candles)).toBeNull();
     });
 
@@ -27,7 +27,8 @@ describe('dropBaseRally', () => {
     });
 
     it('returns null when the base is shorter than MIN_BASE_CANDLES', () => {
-        const candles = [bearishDecisive1(1), bearishDecisive2(2), indecisive1(3), bullishExplosive1(4), bullishExplosive2(5), bullishExplosive2(6)];
+        // 0 indecisive candles between the drop and the explosive leg → no base at all
+        const candles = [bearishDecisive1(1), bearishDecisive2(2), bullishExplosive1(3), bullishExplosive2(4), bullishExplosive2(5), bullishExplosive2(6)];
         expect(dropBaseRally(candles)).toBeNull();
     });
 
@@ -56,18 +57,20 @@ describe('dropBaseRally', () => {
         expect(zone.type).toBe(ZONE_TYPE.DROP_BASE_RALLY);
     });
 
-    it('sets proximalLine to the maximum high of the base candles', () => {
+    it('sets proximalLine to the maximum body (open/close) of the base candles', () => {
         const base1: Candle = { open: 120, close: 121, high: 126, low: 119, timestamp: 3 };
         const base2: Candle = { open: 121, close: 120, high: 123, low: 118, timestamp: 4 };
         const candles = [bearishDecisive1(1), bearishDecisive2(2), base1, base2, bullishExplosive1(5), bullishExplosive2(6)];
-        expect(dropBaseRally(candles)!.proximalLine).toBe(126);
+        // proximalLine = max(max(120,121), max(121,120)) = 121
+        expect(dropBaseRally(candles)!.proximalLine).toBe(121);
     });
 
-    it('sets distalLine to the minimum low of the base candles', () => {
+    it('sets distalLine to the minimum low of the full formation (leg-in + base + leg-out)', () => {
         const base1: Candle = { open: 120, close: 121, high: 124, low: 116, timestamp: 3 };
         const base2: Candle = { open: 121, close: 120, high: 123, low: 119, timestamp: 4 };
         const candles = [bearishDecisive1(1), bearishDecisive2(2), base1, base2, bullishExplosive1(5), bullishExplosive2(6)];
-        expect(dropBaseRally(candles)!.distalLine).toBe(116);
+        // lows across full formation: 126, 112, 116, 119, 116, 137 → min = 112
+        expect(dropBaseRally(candles)!.distalLine).toBe(112);
     });
 
     it('sets startTimestamp to the first candle and endTimestamp to the last candle of the pattern', () => {
