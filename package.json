@@ -16,7 +16,7 @@
     "fetch-candles": "npx ts-node scripts/fetch_candles.ts",
     "visualize-zones": "npx ts-node scripts/visualizeZones.ts",
     "visualize-tests": "npx ts-node scripts/visualizeTestCases.ts",
-    "version": "git add . && git commit -m 'Release v$npm_package_version' && git tag v$npm_package_version"
+        "version": "git add . && git commit -m \"Release v$npm_package_version\" && git tag v$npm_package_version && git push --follow-tags && gh release create v$npm_package_version --title \"v$npm_package_version\" --generate-notes"
   },
   "keywords": [
     "supply",
