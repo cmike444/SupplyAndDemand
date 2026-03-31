@@ -99,10 +99,15 @@ console.log('Is Decisive:', isDecisiveCandle(candle)); // Output depends on the 
 
 #### Detect Explosive Candles
 ```typescript
-import { isExplosiveCandle } from 'supply-and-demand-zones';
+import { isExplosiveCandle } from '@cmike444/supply-and-demand-zones';
 
 const candle = { timestamp: 1, open: 100, high: 150, low: 95, close: 145 };
-console.log('Is Explosive:', isExplosiveCandle(candle)); // Output: true
+
+// Basic check — body/range ratio >= 0.70
+console.log('Is Explosive:', isExplosiveCandle(candle)); // true
+
+// With ATR magnitude check — range must also be >= 1.5 × ATR (e.g. 20)
+console.log('Is Explosive ERC:', isExplosiveCandle(candle, 0.70, 30)); // true if range >= 30
 ```
 
 ### Example: Using Enums and Constants
@@ -129,16 +134,19 @@ console.log('Default Decisive Threshold:', DEFAULT_DECISIVE_THRESHOLD); // Outpu
 #### `identifyZones(candles: Candle[]): { supplyZones: SupplyZone[], demandZones: DemandZone[] }`
 Identifies supply and demand zones in an array of candlestick data.
 
-Every returned zone carries a `confidence` score in [0, 1] computed as the equal-weighted average of six factors (~16.7% each):
+Every returned zone carries a `confidence` score in [0, 1] computed as the equal-weighted average of seven factors:
 
 1. **countFactor** — proportion of departure candles that are decisive or explosive in the departure direction.
 2. **rangeFactor** — average departure candle range normalised by local ATR, clamped to [0, 1].
 3. **volumeFactor** — departure vs base volume ratio through `ratio / (ratio + 1)`. Falls back to 0.5 when volume is absent.
-4. **positionFactor** — price position within the chart's full range; higher for supply zones at elevated prices and demand zones at depressed prices.
-5. **freshnessFactor** — 1.0 if price never re-entered the zone; 0.5 if price touched the proximal line but was repelled before breaching the distal line.
-6. **timeframeFactor** — log-normalised median candle interval from 1 minute (0.0) to 1 week (1.0); higher timeframe zones carry more institutional weight.
+4. **timeFactor** — encodes "Time at Level": 1–3 base candles → 1.0 (tight, sharply-formed imbalance); 4–6 base candles → 0.5.
+5. **positionFactor** — price position within the chart's full range; higher for supply zones at elevated prices and demand zones at depressed prices.
+6. **freshnessFactor** — 1.0 if price never re-entered the zone; 0.5 if price touched the proximal line but was repelled before breaching the distal line.
+7. **timeframeFactor** — log-normalised median candle interval from 1 minute (0.0) to 1 week (1.0); higher timeframe zones carry more institutional weight.
 
-Final formula: `(departureScore × 3 + positionFactor + freshnessFactor + timeframeFactor) / 6`
+Departure sub-score: `(countFactor + rangeFactor + volumeFactor + timeFactor) / 4`
+
+Final formula: `(departureScore × 4 + positionFactor + freshnessFactor + timeframeFactor) / 7`
 
 - **Parameters**:
   - `candles`: An array of `Candle` objects.
@@ -157,12 +165,13 @@ A demand zone's proximal line (upper edge) must never be above a supply zone's p
   - A new object containing only the fresh, non-conflicting zones.
 
 #### `calculateConfidence(departureCandles: Candle[], baseCandles: Candle[], localATR: number, isUpwardDeparture: boolean): number`
-Calculates the **departure-leg sub-score** (0–1) for a zone based on the strength of the candles that exited the base. This is factors 1–3 of the full confidence model — when called through `identifyZones`, three additional context factors (position, freshness, timeframe) are blended in automatically.
+Calculates the **departure-leg sub-score** (0–1) for a zone. This is factors 1–4 of the full confidence model — when called through `identifyZones`, three additional context factors (position, freshness, timeframe) are blended in automatically.
 
-The sub-score is the average of three equally-weighted factors:
+The sub-score is the average of four equally-weighted factors:
 - **countFactor** — proportion of departure candles that are decisive or explosive in the departure direction.
 - **rangeFactor** — average departure candle range normalised by `localATR`, clamped to [0, 1]. Falls back to 0.5 when `localATR` is zero.
 - **volumeFactor** — departure vs base volume ratio mapped through `ratio / (ratio + 1)`. Falls back to 0.5 when volume data is absent.
+- **timeFactor** — encodes "Time at Level": 1–3 base candles → 1.0; 4–6 base candles → 0.5. Fewer candles in the base signal a sharper, less-disputed imbalance.
 
 - **Parameters**:
   - `departureCandles`: Candles forming the explosive leg away from the zone.
@@ -197,14 +206,15 @@ Determines if a candlestick is decisive based on a threshold.
 - **Returns**:
   - `true` if the body size exceeds the threshold, otherwise `false`.
 
-#### `isExplosiveCandle(candle: Candle, threshold?: number): boolean`
-Determines if a candlestick is explosive (body ≥ `threshold` × range).
+#### `isExplosiveCandle(candle: Candle, threshold?: number, minATR?: number): boolean`
+Determines if a candlestick is an Extended Range Candle (ERC) — the "leg-out" that signals an institutional imbalance.
 
 - **Parameters**:
   - `candle`: A `Candle` object.
-  - `threshold` *(optional)*: Minimum body-to-range ratio (default: `DEFAULT_EXPLOSIVE_THRESHOLD = 0.7`).
+  - `threshold` *(optional)*: Minimum body-to-range ratio (default: `DEFAULT_EXPLOSIVE_THRESHOLD = 0.70`). The body must represent at least this proportion of the total range.
+  - `minATR` *(optional)*: Minimum required total range (default: `0`). When > 0, candles whose `high − low` falls below this value are rejected even if their body ratio qualifies. Typically passed as `MIN_EXPLOSIVE_ATR_MULTIPLIER × localATR` (1.5× ATR) to confirm the leg-out is significantly larger than surrounding price action.
 - **Returns**:
-  - `true` if the body-to-range ratio meets or exceeds the threshold, otherwise `false`.
+  - `true` if the body-to-range ratio meets the threshold **and** the total range is ≥ `minATR`.
 
 #### `candleRange(candle: Candle): number`
 Calculates the full range of a candlestick (`high - low`).
@@ -357,11 +367,11 @@ Represents a single candlestick.
 Base interface for all zones.
 
 - **Properties**:
-  - `proximalLine`: The near edge of the zone (closest to current price).
-  - `distalLine`: The far edge of the zone.
+  - `proximalLine`: The near edge of the zone (closest to current price). Derived from candle **bodies** only — for supply zones: the lowest body (open/close) across the base; for demand zones: the highest body (open/close) across the base.
+  - `distalLine`: The far edge of the zone. Spans the **entire formation** (leg-in + base + leg-out) using full wicks — for supply zones: the highest `high`; for demand zones: the lowest `low`.
   - `startTimestamp`: The timestamp of the first candle in the pattern.
   - `endTimestamp`: The timestamp of the last candle in the pattern.
-  - `confidence`: A score in [0, 1] indicating zone strength based on departure candle quality and volume.
+  - `confidence`: A score in [0, 1] indicating zone strength.
 
 #### `SupplyZone`
 Extends `Zone`. Represents a supply zone.
@@ -400,12 +410,13 @@ Pattern type that formed the zone.
 | Constant | Value | Description |
 |---|---|---|
 | `DEFAULT_DECISIVE_THRESHOLD` | `0.5` | Minimum body-to-range ratio for a decisive candle. |
-| `DEFAULT_EXPLOSIVE_THRESHOLD` | `0.7` | Minimum body-to-range ratio for an explosive candle. |
+| `DEFAULT_EXPLOSIVE_THRESHOLD` | `0.7` | Minimum body-to-range ratio for an explosive candle (ERC). |
 | `DEFAULT_ATR_PERIOD` | `14` | Look-back period for ATR calculation (Wilder's standard). |
 | `MIN_RALLY_CANDLES` | `2` | Minimum consecutive bullish candles required to define a rally leg. |
 | `MIN_DROP_CANDLES` | `2` | Minimum consecutive bearish candles required to define a drop leg. |
-| `MIN_BASE_CANDLES` | `2` | Minimum indecisive candles required for a valid base. |
-| `MAX_BASE_CANDLES` | `8` | Maximum indecisive candles allowed in a base. |
+| `MIN_BASE_CANDLES` | `1` | Minimum indecisive candles required for a valid base. |
+| `MAX_BASE_CANDLES` | `6` | Maximum indecisive candles allowed in a base. More than 6 indicates the imbalance is too dispersed. |
+| `MIN_EXPLOSIVE_ATR_MULTIPLIER` | `1.5` | Minimum ERC total range as a multiple of ATR. The leg-out must be significantly larger than surrounding price action. |
 | `MAX_ZONE_ATR_MULTIPLIER` | `1.5` | Maximum base high-to-low range as a multiple of ATR. |
 | `MAX_BASE_GAP_ATR_MULTIPLIER` | `0.5` | Maximum open-to-prior-close gap within a base as a multiple of ATR. |
 
