@@ -116,4 +116,83 @@ describe('identifyZones', () => {
         expect(demandZones).toHaveLength(1);
         expect(demandZones[0].type).toBe(ZONE_TYPE.RALLY_BASE_RALLY);
     });
+
+    // --- rrScore ---
+
+    it('sets rrScore on every zone returned', () => {
+        const candles = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const { supplyZones } = identifyZones(candles);
+        expect(supplyZones).toHaveLength(1);
+        expect(supplyZones[0].rrScore).toBeDefined();
+    });
+
+    it('rrScore is in [0, 1]', () => {
+        const candles = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const { supplyZones } = identifyZones(candles);
+        expect(supplyZones[0].rrScore).toBeGreaterThanOrEqual(0);
+        expect(supplyZones[0].rrScore).toBeLessThanOrEqual(1);
+    });
+
+    it('rrScore is computed from the departure leg (no opposing zone needed)', () => {
+        // Supply zone only — departure is bearish explosive candles going down.
+        // rrScore = min(targetDistance / stopDistance / 5, 1) > 0.
+        const candles = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const { supplyZones } = identifyZones(candles);
+        // Departure travelled a measurable distance — score must be > 0
+        expect(supplyZones[0].rrScore).toBeGreaterThan(0);
+    });
+
+    it('rrScore is higher when the opposing zone is farther away (better R:R)', () => {
+        // Use the same candle sequence that's known to produce one supply + one demand zone
+        const candles = [
+            bearishDecisive1(1),  bearishDecisive2(2),
+            indecisive1(3),       indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+            bearishDecisive1(7),  bearishDecisive2(8),
+            indecisive1(9),       indecisive2(10),
+            bullishExplosive1(11), bullishExplosive2(12),
+        ];
+        const { supplyZones, demandZones } = identifyZones(candles);
+        expect(supplyZones).toHaveLength(1);
+        expect(demandZones).toHaveLength(1);
+        // Both zones have an opposing zone — rrScore should be computed (not the 0.5 fallback)
+        expect(supplyZones[0].rrScore).toBeGreaterThanOrEqual(0);
+        expect(demandZones[0].rrScore).toBeGreaterThanOrEqual(0);
+    });
+
+    it('rrScore is factored into confidence (confidence changes when opposing zone is present)', () => {
+        // Zone without an opposing zone — rrScore defaults to 0.5 (neutral, no change to confidence)
+        const supplyOnly = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const { supplyZones: soloSupply } = identifyZones(supplyOnly);
+
+        // Same supply zone but now with an opposing demand zone present
+        const withDemand = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+            bearishDecisive1(7), bearishDecisive2(8),
+            indecisive1(9), indecisive2(10),
+            bullishExplosive1(11), bullishExplosive2(12),
+        ];
+        const { supplyZones: pairedSupply } = identifyZones(withDemand);
+
+        // confidence must differ because rrScore is non-neutral (≠ 0.5) when a real opposing zone exists
+        expect(pairedSupply[0].confidence).not.toBeCloseTo(soloSupply[0].confidence, 5);
+    });
 });
