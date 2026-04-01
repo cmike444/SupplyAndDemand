@@ -449,7 +449,11 @@ Base interface for all zones.
 | `distalLine` | `number` | Far edge of the zone. Spans the **entire formation** (leg-in + base + leg-out) using full wicks — for supply zones: the highest `high`; for demand zones: the lowest `low`. |
 | `startTimestamp` | `number` | Timestamp of the first candle in the pattern. |
 | `endTimestamp` | `number` | Timestamp of the last candle in the pattern. |
-| `confidence` | `number` | Score in [0, 1] indicating zone strength. |
+| `confidence` | `number` | Score in [0, 1] indicating zone strength. Blends 7 equally-weighted factors: departure quality (×3), position, freshness, timeframe, and `rrScore`. |
+| `rrScore` | `number` | Departure-based risk/reward score in [0, 1]. `min(departureExtent / zoneWidth / 5, 1)` — a score of 1.0 represents ≥ 5:1 R:R. Always set by `identifyZones`. |
+| `entryPrice` | `number` | Suggested limit order entry price. Equal to `proximalLine`. Always set by `identifyZones`. |
+| `stopPrice` | `number` | Hard stop price — zone invalidation level. Equal to `distalLine`. Always set by `identifyZones`. |
+| `targetPrice` | `number \| null` | Profit target — proximal line of the nearest opposing zone. `null` when no opposing zone exists in the dataset. Always set by `identifyZones`. |
 
 ### `SupplyZone`
 

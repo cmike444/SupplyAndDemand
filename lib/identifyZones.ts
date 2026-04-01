@@ -181,5 +181,22 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
         zone.confidence = (zone.confidence * 6 + zone.rrScore) / 7;
     }
 
+    for (const zone of supplyZones) {
+        zone.entryPrice = zone.proximalLine;
+        zone.stopPrice = zone.distalLine;
+        const nearest = demandZones
+            .filter(d => d.proximalLine < zone.proximalLine)
+            .sort((a, b) => b.proximalLine - a.proximalLine)[0];
+        zone.targetPrice = nearest ? nearest.proximalLine : null;
+    }
+    for (const zone of demandZones) {
+        zone.entryPrice = zone.proximalLine;
+        zone.stopPrice = zone.distalLine;
+        const nearest = supplyZones
+            .filter(s => s.proximalLine > zone.proximalLine)
+            .sort((a, b) => a.proximalLine - b.proximalLine)[0];
+        zone.targetPrice = nearest ? nearest.proximalLine : null;
+    }
+
     return { supplyZones, demandZones };
 }

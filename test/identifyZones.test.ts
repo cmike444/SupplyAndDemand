@@ -195,4 +195,71 @@ describe('identifyZones', () => {
         // confidence must differ because rrScore is non-neutral (≠ 0.5) when a real opposing zone exists
         expect(pairedSupply[0].confidence).not.toBeCloseTo(soloSupply[0].confidence, 5);
     });
+
+    // --- entryPrice / stopPrice / targetPrice ---
+    it('sets entryPrice equal to proximalLine', () => {
+        const candles = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const { supplyZones } = identifyZones(candles);
+        expect(supplyZones[0].entryPrice).toBe(supplyZones[0].proximalLine);
+    });
+
+    it('sets stopPrice equal to distalLine', () => {
+        const candles = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const { supplyZones } = identifyZones(candles);
+        expect(supplyZones[0].stopPrice).toBe(supplyZones[0].distalLine);
+    });
+
+    it('sets targetPrice to the opposing zone proximal when one exists', () => {
+        // Supply zone base at ~162, demand zone base at ~80 — clearly separated price levels.
+        // ts7-8 are DECISIVE (not explosive) bearish to prevent the supply departure from consuming them.
+        const candles = [
+            // Drop into supply base (ts 1-2)
+            { open:200, close:180, high:202, low:178, timestamp:1 },
+            { open:181, close:162, high:183, low:160, timestamp:2 },
+            // Supply base (ts 3-4): proximalLine = min body = 162
+            { open:163, close:162, high:165, low:160, timestamp:3 },
+            { open:162, close:163, high:164, low:161, timestamp:4 },
+            // Explosive drop departure (ts 5-6) — supply zone departs here
+            { open:161, close:137, high:162, low:136, timestamp:5 },
+            { open:138, close:115, high:139, low:114, timestamp:6 },
+            // Decisive (not explosive) drop into demand base (ts 7-8): body/range ~0.63 < 0.7
+            { open:115, close: 96, high:120, low: 90, timestamp:7 },
+            { open: 97, close: 79, high:102, low: 74, timestamp:8 },
+            // Demand base (ts 9-10): proximalLine = max body = 80
+            { open: 80, close: 79, high: 82, low: 77, timestamp:9 },
+            { open: 79, close: 80, high: 81, low: 78, timestamp:10 },
+            // Explosive rally departure (ts 11-12) — demand zone departs here
+            { open: 79, close:103, high:104, low: 78, timestamp:11 },
+            { open:102, close:125, high:126, low:101, timestamp:12 },
+        ];
+        const { supplyZones, demandZones } = identifyZones(candles);
+        expect(supplyZones).toHaveLength(1);
+        expect(demandZones).toHaveLength(1);
+        // Supply proximal (~162) > demand proximal (~80):
+        // supply targets the demand zone below it
+        expect(supplyZones[0].targetPrice).toBe(demandZones[0].proximalLine);
+        // demand targets the supply zone above it
+        expect(demandZones[0].targetPrice).toBe(supplyZones[0].proximalLine);
+    });
+
+    it('sets targetPrice to null when no opposing zone exists', () => {
+        const candles = [
+            bearishDecisive1(1), bearishDecisive2(2),
+            indecisive1(3), indecisive2(4),
+            bearishExplosive1(5), bearishExplosive2(6),
+        ];
+        const { supplyZones, demandZones } = identifyZones(candles);
+        // supply only — no demand zone, so targetPrice is null on supply
+        expect(supplyZones[0].targetPrice).toBeNull();
+        // no demand zones at all
+        expect(demandZones).toHaveLength(0);
+    });
 });

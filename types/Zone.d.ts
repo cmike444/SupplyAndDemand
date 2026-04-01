@@ -21,6 +21,12 @@ import { Candle } from './Candle';
  *   zone required. Access this directly to filter or grade setups before entry.
  *   Always set on any zone returned by `identifyZones`. Optional here only so pattern
  *   functions (rallyBaseDrop etc.) are not required to set it.
+ * @property {number} entryPrice - Limit order entry price. Equal to `proximalLine`.
+ * @property {number} stopPrice - Hard stop price. Equal to `distalLine`. A close beyond
+ *   this level invalidates the zone thesis.
+ * @property {number | null} targetPrice - Target exit price. The proximal line of the nearest
+ *   opposing zone (supply proximal for demand zones; demand proximal for supply zones).
+ *   `null` when no opposing zone exists in the dataset.
  * @property {Candle['timestamp']} startTimestamp - The starting timestamp of the zone, derived from a Candle's timestamp.
  * @property {Candle['timestamp']} endTimestamp - The ending timestamp of the zone, derived from a Candle's timestamp.
  */
@@ -30,5 +36,25 @@ export interface Zone {
     startTimestamp: Candle['timestamp'];
     endTimestamp: Candle['timestamp'];
     confidence: number;
+    /** Always set by identifyZones(); optional here only so pattern functions need not set it. */
     rrScore?: number;
+    /**
+     * Limit order entry price for this zone. Equal to `proximalLine`.
+     * Always set by `identifyZones`.
+     */
+    entryPrice?: number;
+    /**
+     * Hard stop price — zone invalidation level. Equal to `distalLine`.
+     * Always set by `identifyZones`.
+     */
+    stopPrice?: number;
+    /**
+     * Target price — proximal line of the nearest opposing zone.
+     * Demand zones: nearest supply proximal above `entryPrice`.
+     * Supply zones: nearest demand proximal below `entryPrice`.
+     * `null` when no opposing zone exists in the dataset.
+     * Always set by `identifyZones`.
+     */
+    targetPrice?: number | null;
 }
+
