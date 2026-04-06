@@ -197,7 +197,7 @@ describe('identifyZones', () => {
     });
 
     // --- entryPrice / stopPrice / targetPrice ---
-    it('sets entryPrice equal to proximal', () => {
+    it('sets entryPrice equal to proximalLine', () => {
         const candles = [
             bearishDecisive1(1), bearishDecisive2(2),
             indecisive1(3), indecisive2(4),
@@ -207,7 +207,7 @@ describe('identifyZones', () => {
         expect(supplyZones[0].entryPrice).toBe(supplyZones[0].proximalLine);
     });
 
-    it('sets stopPrice equal to distal', () => {
+    it('sets stopPrice equal to distalLine', () => {
         const candles = [
             bearishDecisive1(1), bearishDecisive2(2),
             indecisive1(3), indecisive2(4),
@@ -224,7 +224,7 @@ describe('identifyZones', () => {
             // Drop into supply base (ts 1-2)
             { open:200, close:180, high:202, low:178, timestamp:1 },
             { open:181, close:162, high:183, low:160, timestamp:2 },
-            // Supply base (ts 3-4): proximal = min body = 162
+            // Supply base (ts 3-4): proximalLine = min body = 162
             { open:163, close:162, high:165, low:160, timestamp:3 },
             { open:162, close:163, high:164, low:161, timestamp:4 },
             // Explosive drop departure (ts 5-6) — supply zone departs here
@@ -233,7 +233,7 @@ describe('identifyZones', () => {
             // Decisive (not explosive) drop into demand base (ts 7-8): body/range ~0.63 < 0.7
             { open:115, close: 96, high:120, low: 90, timestamp:7 },
             { open: 97, close: 79, high:102, low: 74, timestamp:8 },
-            // Demand base (ts 9-10): proximal = max body = 80
+            // Demand base (ts 9-10): proximalLine = max body = 80
             { open: 80, close: 79, high: 82, low: 77, timestamp:9 },
             { open: 79, close: 80, high: 81, low: 78, timestamp:10 },
             // Explosive rally departure (ts 11-12) — demand zone departs here

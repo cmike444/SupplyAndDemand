@@ -1,9 +1,11 @@
+import { Candle } from './Candle';
+
 /**
  * Represents a Zone with specific boundaries and time range.
  *
  * @interface Zone
- * @property {number} proximalLine - The proximal boundary line of the zone (near current price).
- * @property {number} distalLine - The distal boundary line of the zone (far edge).
+ * @property {number} proximalLine - The proximal boundary line of the zone.
+ * @property {number} distalLine - The distal boundary line of the zone.
  * @property {number} confidence - Confidence score in [0, 1]. The average of seven equally-weighted
  *   factors: (1) proportion of strong departure candles, (2) departure range vs ATR,
  *   (3) departure vs base volume ratio, (4) price position — higher for supply zones at
@@ -23,16 +25,16 @@
  * @property {number} stopPrice - Hard stop price. Equal to `distalLine`. A close beyond
  *   this level invalidates the zone thesis.
  * @property {number | null} targetPrice - Target exit price. The proximal line of the nearest
- *   opposing zone (supply proximalLine for demand zones; demand proximalLine for supply zones).
+ *   opposing zone (supply proximal for demand zones; demand proximal for supply zones).
  *   `null` when no opposing zone exists in the dataset.
- * @property {number} startTimestamp - The starting timestamp of the zone (Unix ms).
- * @property {number} endTimestamp - The ending timestamp of the zone (Unix ms).
+ * @property {Candle['timestamp']} startTimestamp - The starting timestamp of the zone, derived from a Candle's timestamp.
+ * @property {Candle['timestamp']} endTimestamp - The ending timestamp of the zone, derived from a Candle's timestamp.
  */
 export interface Zone {
     proximalLine: number;
     distalLine: number;
-    startTimestamp: number;
-    endTimestamp: number;
+    startTimestamp: Candle['timestamp'];
+    endTimestamp: Candle['timestamp'];
     confidence: number;
     /** Always set by identifyZones(); optional here only so pattern functions need not set it. */
     rrScore?: number;
@@ -47,11 +49,12 @@ export interface Zone {
      */
     stopPrice?: number;
     /**
-     * Target price — proximalLine of the nearest opposing zone.
-     * Demand zones: nearest supply proximalLine above `entryPrice`.
-     * Supply zones: nearest demand proximalLine below `entryPrice`.
+     * Target price — proximal line of the nearest opposing zone.
+     * Demand zones: nearest supply proximal above `entryPrice`.
+     * Supply zones: nearest demand proximal below `entryPrice`.
      * `null` when no opposing zone exists in the dataset.
      * Always set by `identifyZones`.
      */
     targetPrice?: number | null;
 }
+
