@@ -20,7 +20,7 @@ import { rallyBaseRally } from './rallyBaseRally';
  * - **positionFactor**: higher for supply zones at elevated prices and demand zones at
  *   depressed prices — harder for the opposing side to push through.
  * - **freshnessFactor**: 1.0 if price has never entered the zone since formation; 0.5 if
- *   price touched the proximal line but was repelled before the distal line.
+ *   price touched the proximalLine line but was repelled before the distal line.
  * - **timeframeFactor**: log-normalised candle interval — 1m → 0.0, 1w → 1.0. Higher
  *   timeframe zones carry more institutional significance.
  * - **rrScore**: departure-based risk/reward score. Measures how far price actually
@@ -48,7 +48,7 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
         priceRange > 0 ? (price - globalMin) / priceRange : 0.5;
 
     /**
-     * 1.0 = never entered; 0.5 = entered (proximal touched) but not breached.
+     * 1.0 = never entered; 0.5 = entered (proximalLine touched) but not breached.
      * Supply: price enters when a candle's high >= proximalLine.
      * Demand: price enters when a candle's low  <= proximalLine.
      */
@@ -142,7 +142,7 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
     // Departure-based: uses the measured distance price actually travelled away from the zone
     // during the departure leg as the proxy for target distance.
     //
-    // stopDistance     = zone width (|proximalLine − distalLine|).
+    // stopDistance     = zone width (|proximalLine − distal|).
     // departureExtent  = for supply zones: min low of departure candles (price went down);
     //                    for demand zones: max high of departure candles (price went up).
     // targetDistance   = |departureExtent − proximalLine|.
@@ -152,11 +152,11 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
     // Re-blends confidence as a 7th equal slot: (existingConfidence × 6 + rrScore) / 7.
     const computeRRScore = (
         proximalLine: number,
-        distalLine: number,
+        distal: number,
         endTimestamp: number,
         isSupply: boolean,
     ): number => {
-        const stopDistance = Math.abs(proximalLine - distalLine);
+        const stopDistance = Math.abs(proximalLine - distal);
         if (stopDistance === 0) return 0;
 
         // Departure candles run from proximalLine formation up to (and including) endTimestamp.

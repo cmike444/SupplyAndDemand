@@ -3,11 +3,11 @@ import { SupplyZone, DemandZone } from '../types';
 /**
  * Filters out stale zones based on price-level freshness rules:
  *
- * - A demand zone can never be priced above a supply zone. If `demand.proximalLine`
- *   (the upper edge of the demand zone) is greater than `supply.proximalLine`
+ * - A demand zone can never be priced above a supply zone. If `demand.proximal`
+ *   (the upper edge of the demand zone) is greater than `supply.proximal`
  *   (the lower edge of the supply zone), the zones are in conflict.
  *
- * - When a conflict is detected, the zone with the older `endTimestamp` is removed —
+ * - When a conflict is detected, the zone with the older `endTs` is removed —
  *   it was effectively consumed by the price move that created the newer zone.
  *   On a tie, the demand zone is removed.
  *

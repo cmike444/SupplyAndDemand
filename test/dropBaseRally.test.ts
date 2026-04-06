@@ -57,15 +57,15 @@ describe('dropBaseRally', () => {
         expect(zone.type).toBe(ZONE_TYPE.DROP_BASE_RALLY);
     });
 
-    it('sets proximalLine to the maximum body (open/close) of the base candles', () => {
+    it('sets proximal to the maximum body (open/close) of the base candles', () => {
         const base1: Candle = { open: 120, close: 121, high: 126, low: 119, timestamp: 3 };
         const base2: Candle = { open: 121, close: 120, high: 123, low: 118, timestamp: 4 };
         const candles = [bearishDecisive1(1), bearishDecisive2(2), base1, base2, bullishExplosive1(5), bullishExplosive2(6)];
-        // proximalLine = max(max(120,121), max(121,120)) = 121
+        // proximal = max(max(120,121), max(121,120)) = 121
         expect(dropBaseRally(candles)!.proximalLine).toBe(121);
     });
 
-    it('sets distalLine to the minimum low of the full formation (leg-in + base + leg-out)', () => {
+    it('sets distal to the minimum low of the full formation (leg-in + base + leg-out)', () => {
         const base1: Candle = { open: 120, close: 121, high: 124, low: 116, timestamp: 3 };
         const base2: Candle = { open: 121, close: 120, high: 123, low: 119, timestamp: 4 };
         const candles = [bearishDecisive1(1), bearishDecisive2(2), base1, base2, bullishExplosive1(5), bullishExplosive2(6)];
@@ -73,7 +73,7 @@ describe('dropBaseRally', () => {
         expect(dropBaseRally(candles)!.distalLine).toBe(112);
     });
 
-    it('sets startTimestamp to the first candle and endTimestamp to the last candle of the pattern', () => {
+    it('sets startTs to the first candle and endTs to the last candle of the pattern', () => {
         const candles = [
             bearishDecisive1(1), bearishDecisive2(2),
             indecisive1(3), indecisive2(4),

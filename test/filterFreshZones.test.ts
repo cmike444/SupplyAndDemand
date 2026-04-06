@@ -2,7 +2,7 @@ import { filterFreshZones } from '../lib';
 import { SupplyZone, DemandZone } from '../types';
 import { ZONE_DIRECTION, ZONE_TYPE } from '../enums';
 
-// Supply zone: proximalLine is the LOWER edge (bottom of supply)
+// Supply zone: proximal is the LOWER edge (bottom of supply)
 const supply = (proximal: number, distal: number, endTs: number): SupplyZone => ({
     direction: ZONE_DIRECTION.SUPPLY,
     type: ZONE_TYPE.RALLY_BASE_DROP,
@@ -13,7 +13,7 @@ const supply = (proximal: number, distal: number, endTs: number): SupplyZone => 
     confidence: 0.5,
 });
 
-// Demand zone: proximalLine is the UPPER edge (top of demand)
+// Demand zone: proximal is the UPPER edge (top of demand)
 const demand = (proximal: number, distal: number, endTs: number): DemandZone => ({
     direction: ZONE_DIRECTION.DEMAND,
     type: ZONE_TYPE.DROP_BASE_RALLY,
@@ -53,7 +53,7 @@ describe('filterFreshZones', () => {
         expect(result.demandZones).toEqual([d]);
     });
 
-    // --- Conflict: demand.proximalLine > supply.proximalLine ---
+    // --- Conflict: demand.proximal > supply.proximal ---
 
     it('removes the demand zone when it is older than the conflicting supply zone', () => {
         // demand proximal=250 > supply proximal=200: conflict
@@ -75,7 +75,7 @@ describe('filterFreshZones', () => {
         expect(result.demandZones).toEqual([d]);
     });
 
-    it('removes the demand zone as tie-break when both zones have equal endTimestamp', () => {
+    it('removes the demand zone as tie-break when both zones have equal endTs', () => {
         const s = supply(200, 210, 5);
         const d = demand(250, 230, 5);
         const result = filterFreshZones([s], [d]);
