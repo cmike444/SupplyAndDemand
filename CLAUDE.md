@@ -39,21 +39,24 @@ Each pattern function:
 - Calls internal helpers: `isValidBase()`, `findPatternEnd()`, `calculateConfidence()`
 
 ### Confidence Scoring (7-factor model)
-**Departure score** (factors 1–4, averaged):
+**Departure score** (factors 1–4, averaged by `calculateConfidence()`):
 1. **countFactor** — Ratio of decisive/explosive candles in departure leg
 2. **rangeFactor** — Avg departure candle range normalized by local ATR (clamped [0,1])
 3. **volumeFactor** — Departure vs base volume ratio mapped: `ratio / (ratio + 1)`
-4. **timeFactor** — Time at level: 1–3 candles = 1.0; 4–6 = 0.5; 6+ = 0.0
+4. **timeFactor** — Time at level: 1–3 candles = 1.0; 4–6 = 0.5; 7+ = 0.0
 
-**Context factors** (added in identifyZones, weighted /7):
+**Context factors** (added in identifyZones):
 5. **positionFactor** — Higher for supply zones at elevated prices, demand zones at low prices
 6. **freshnessFactor** — 1.0 if price never re-entered; 0.5 if touched proximal but repelled before distal
-7. **timeframeFactor** — Log-normalized candle interval (1m = 0.0, 1 week = 1.0)
+7. **rrScore** — Departure-based risk/reward: `min(departureExtent / stopDistance / 5, 1)`; 5:1 R:R = 1.0
 
-**Formula**:
+**timeframeFactor** — Log-normalized candle interval (1m = 0.0, 1 week = 1.0); blended as a context factor alongside positionFactor and freshnessFactor.
+
+**Formula** (two-step blend, each of the 7 factors gets equal ~14.3% weight):
 ```
-departureScore = (countFactor + rangeFactor + volumeFactor + timeFactor) / 4
-confidence = (departureScore × 4 + positionFactor + freshnessFactor + timeframeFactor) / 7
+departureScore   = (countFactor + rangeFactor + volumeFactor + timeFactor) / 4
+sixFactorScore   = (departureScore × 3 + positionFactor + freshnessFactor + timeframeFactor) / 6
+confidence       = (sixFactorScore × 6 + rrScore) / 7
 ```
 
 ### Candle Utilities
@@ -61,13 +64,19 @@ confidence = (departureScore × 4 + positionFactor + freshnessFactor + timeframe
 - **lib/isBullishCandle.ts**, **lib/isBearishCandle.ts** — Direction checks
 - **lib/isDecisiveCandle.ts**, **lib/isIndecisiveCandle.ts** — Body/range ratio checks (threshold = 0.5 default)
 - **lib/isExplosiveCandle.ts** — Extended Range Candle (ERC) detection; body/range ≥ 0.70 + range ≥ 1.5×ATR
-- **lib/isBullishDecisiveCandle.ts**, **lib/isBearishDecisiveCandle.ts** — Combined checks
+- **lib/isBullishDecisiveCandle.ts**, **lib/isBearishDecisiveCandle.ts** — Combined direction + decisive checks
+- **lib/isBullishExplosiveCandle.ts**, **lib/isBearishExplosiveCandle.ts** — Directional ERC checks; used by `calculateConfidence`
 - **lib/atr.ts** — Average True Range (14-period default, simple mean)
+- **lib/rvol.ts** — Relative Volume: `current.volume / mean(prior N volumes)`
 
 ### Types & Constants
-- **types/Candle.ts** — `{ timestamp, open, high, low, close, volume? }`
-- **types/Zone.ts** — Base zone interface: `proximalLine, distalLine, startTimestamp, endTimestamp, confidence`
-- **types/SupplyZone.ts**, **types/DemandZone.ts** — Extend Zone with `direction` and `type`
+- **types/Candle.d.ts** — `{ timestamp, open, high, low, close, volume? }`
+- **types/Zone.d.ts** — Base zone interface: `proximalLine, distalLine, startTimestamp, endTimestamp, confidence, rrScore?, entryPrice?, stopPrice?, targetPrice?`
+  - `rrScore` — Standalone R:R score [0,1]; always set by `identifyZones`
+  - `entryPrice` — Limit entry; equals `proximalLine`
+  - `stopPrice` — Stop/invalidation level; equals `distalLine`
+  - `targetPrice` — Proximal line of nearest opposing zone; `null` if none exists
+- **types/SupplyZone.d.ts**, **types/DemandZone.d.ts** — Extend Zone with `direction` and `type`
 - **enums/ZONE_DIRECTION.ts** — SUPPLY (0), DEMAND (1)
 - **enums/ZONE_TYPE.ts** — DROP_BASE_DROP (0), RALLY_BASE_RALLY (1), DROP_BASE_RALLY (2), RALLY_BASE_DROP (3)
 - **constants/index.ts** — Key thresholds (MAX_BASE_CANDLES=6, MIN_EXPLOSIVE_ATR_MULTIPLIER=1.5, etc.)
@@ -118,4 +127,4 @@ confidence = (departureScore × 4 + positionFactor + freshnessFactor + timeframe
 - ATR defaults to 14-period; all internal calculations normalize to local ATR context
 - Enums are 0-indexed numbers (not strings) for efficiency
 - Pattern detection is non-overlapping: each candle appears in at most one zone
-- The confidence model balances institutional strength (departure) with market context (position, freshness, timeframe)
+- The confidence model balances institutional strength (departure) with market context (position, freshness, timeframe, rrScore)
