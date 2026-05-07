@@ -9,6 +9,7 @@ import { isBearishCandle } from './isBearishCandle';
 import { isExplosiveCandle } from './isExplosiveCandle';
 import { isValidBase } from './isValidBase';
 import { calculateConfidence } from './calculateConfidence';
+import { hasValidZoneBounds } from './hasValidZoneBounds';
 
 /**
  * Identifies a rally-base-rally pattern in a series of candlestick data.
@@ -46,11 +47,16 @@ export function rallyBaseRally(candles: Candle[], localATR: number = 0): DemandZ
 
     const departureCandles = candles.slice(baseEndIndex, rallyZoneStartIndex);
     const fullFormation = candles.slice(0, rallyZoneStartIndex);
+    const proximalLine = Math.max(...baseCandles.map(c => Math.max(c.open, c.close)));
+    const distalLine = Math.min(...fullFormation.map(c => c.low));
+
+    if (!hasValidZoneBounds(proximalLine, distalLine, ZONE_DIRECTION.DEMAND)) return null;
+
     return {
         direction: ZONE_DIRECTION.DEMAND,
         type: ZONE_TYPE.RALLY_BASE_RALLY,
-        proximalLine: Math.max(...baseCandles.map(c => Math.max(c.open, c.close))),
-        distalLine: Math.min(...fullFormation.map(c => c.low)),
+        proximalLine,
+        distalLine,
         startTimestamp: candles[0].timestamp,
         endTimestamp: candles[rallyZoneStartIndex - 1].timestamp,
         confidence: calculateConfidence(departureCandles, baseCandles, localATR, true),

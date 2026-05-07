@@ -37,6 +37,19 @@ describe('dropBaseDrop', () => {
         expect(dropBaseDrop(candles)).toBeNull();
     });
 
+    it('returns null when the zone would have zero width', () => {
+        const candles = [
+            { open: 100, close: 90, high: 100, low: 89, timestamp: 1 },
+            { open: 90, close: 80, high: 90, low: 79, timestamp: 2 },
+            { open: 100, close: 100, high: 100, low: 99, timestamp: 3 },
+            { open: 100, close: 100, high: 100, low: 99, timestamp: 4 },
+            { open: 100, close: 80, high: 100, low: 79, timestamp: 5 },
+            { open: 80, close: 60, high: 80, low: 59, timestamp: 6 },
+        ];
+
+        expect(dropBaseDrop(candles)).toBeNull();
+    });
+
     it('returns a SupplyZone for a valid drop-base-drop pattern', () => {
         const candles = [
             bearishDecisive1(1), bearishDecisive2(2),

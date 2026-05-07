@@ -37,6 +37,19 @@ describe('rallyBaseDrop', () => {
         expect(rallyBaseDrop(candles)).toBeNull();
     });
 
+    it('returns null when the zone would have zero width', () => {
+        const candles = [
+            { open: 80, close: 90, high: 90, low: 79, timestamp: 1 },
+            { open: 90, close: 100, high: 100, low: 89, timestamp: 2 },
+            { open: 100, close: 100, high: 100, low: 99, timestamp: 3 },
+            { open: 100, close: 100, high: 100, low: 99, timestamp: 4 },
+            { open: 100, close: 80, high: 100, low: 79, timestamp: 5 },
+            { open: 80, close: 60, high: 80, low: 59, timestamp: 6 },
+        ];
+
+        expect(rallyBaseDrop(candles)).toBeNull();
+    });
+
     it('returns a SupplyZone for a valid rally-base-drop pattern', () => {
         const candles = [
             bullishDecisive1(1), bullishDecisive2(2),

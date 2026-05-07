@@ -9,6 +9,7 @@ import { isBullishCandle } from './isBullishCandle';
 import { isExplosiveCandle } from './isExplosiveCandle';
 import { isValidBase } from './isValidBase';
 import { calculateConfidence } from './calculateConfidence';
+import { hasValidZoneBounds } from './hasValidZoneBounds';
 
 /**
  * Identifies a drop-base-drop pattern in a series of candlestick data.
@@ -46,11 +47,16 @@ export function dropBaseDrop(candles: Candle[], localATR: number = 0): SupplyZon
 
     const departureCandles = candles.slice(baseEndIndex, dropZoneStartIndex);
     const fullFormation = candles.slice(0, dropZoneStartIndex);
+    const proximalLine = Math.min(...baseCandles.map(c => Math.min(c.open, c.close)));
+    const distalLine = Math.max(...fullFormation.map(c => c.high));
+
+    if (!hasValidZoneBounds(proximalLine, distalLine, ZONE_DIRECTION.SUPPLY)) return null;
+
     return {
         direction: ZONE_DIRECTION.SUPPLY,
         type: ZONE_TYPE.DROP_BASE_DROP,
-        proximalLine: Math.min(...baseCandles.map(c => Math.min(c.open, c.close))),
-        distalLine: Math.max(...fullFormation.map(c => c.high)),
+        proximalLine,
+        distalLine,
         startTimestamp: candles[0].timestamp,
         endTimestamp: candles[dropZoneStartIndex - 1].timestamp,
         confidence: calculateConfidence(departureCandles, baseCandles, localATR, false),

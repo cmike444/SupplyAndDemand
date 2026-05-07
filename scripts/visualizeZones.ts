@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { identifyZones } from '../lib/identifyZones';
 import { filterFreshZones } from '../lib/filterFreshZones';
+import { hasValidZoneBounds } from '../lib/hasValidZoneBounds';
 import { rvol } from '../lib';
 import { Candle, SupplyZone, DemandZone } from '../types';
 import { buildNavSidebar } from './navSidebar';
@@ -24,10 +25,12 @@ try {
 
 const { supplyZones, demandZones } = identifyZones(candles);
 const { supplyZones: freshSupply, demandZones: freshDemand } = filterFreshZones(supplyZones, demandZones);
+const validFreshSupply = freshSupply.filter(z => hasValidZoneBounds(z.proximalLine, z.distalLine, z.direction));
+const validFreshDemand = freshDemand.filter(z => hasValidZoneBounds(z.proximalLine, z.distalLine, z.direction));
 const staleRemoved = (supplyZones.length - freshSupply.length) + (demandZones.length - freshDemand.length);
 
-console.log(`Supply zones identified: ${supplyZones.length} (${freshSupply.length} fresh)`);
-console.log(`Demand zones identified: ${demandZones.length} (${freshDemand.length} fresh)`);
+console.log(`Supply zones identified: ${supplyZones.length} (${validFreshSupply.length} fresh)`);
+console.log(`Demand zones identified: ${demandZones.length} (${validFreshDemand.length} fresh)`);
 if (staleRemoved > 0) console.log(`Stale zones removed by freshness filter: ${staleRemoved}`);
 
 // Build timestamp → index map to eliminate overnight/weekend gaps
@@ -70,15 +73,15 @@ function findBreachIndex(startIdx: number, distalLine: number, isBullishZone: bo
     return lastIdx;
 }
 
-const intactSupply = freshSupply.filter(z => {
+const intactSupply = validFreshSupply.filter(z => {
     const endIdx = timestampToIndex.get(z.endTimestamp) ?? 0;
     return findBreachIndex(endIdx, z.distalLine, false) === lastIdx;
 });
-const intactDemand = freshDemand.filter(z => {
+const intactDemand = validFreshDemand.filter(z => {
     const endIdx = timestampToIndex.get(z.endTimestamp) ?? 0;
     return findBreachIndex(endIdx, z.distalLine, true) === lastIdx;
 });
-const breachedRemoved = (freshSupply.length - intactSupply.length) + (freshDemand.length - intactDemand.length);
+const breachedRemoved = (validFreshSupply.length - intactSupply.length) + (validFreshDemand.length - intactDemand.length);
 
 // ECharts markArea data: each zone is a pair of corner objects with x/y + itemStyle
 // Zone fill opacity is scaled by confidence: low confidence (0) → faint, high (1) → solid

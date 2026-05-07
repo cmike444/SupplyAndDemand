@@ -49,6 +49,33 @@ describe('identifyZones', () => {
         expect(result.demandZones).toHaveLength(0);
     });
 
+    it('does not return zero-width zones from the scanner', () => {
+        const degenerateSupply = [
+            { open: 100, close: 90, high: 100, low: 89, timestamp: 1 },
+            { open: 90, close: 80, high: 90, low: 79, timestamp: 2 },
+            { open: 100, close: 100, high: 100, low: 99, timestamp: 3 },
+            { open: 100, close: 100, high: 100, low: 99, timestamp: 4 },
+            { open: 100, close: 80, high: 100, low: 79, timestamp: 5 },
+            { open: 80, close: 60, high: 80, low: 59, timestamp: 6 },
+        ];
+        const degenerateDemand = [
+            { open: 120, close: 110, high: 121, low: 110, timestamp: 1 },
+            { open: 110, close: 100, high: 111, low: 100, timestamp: 2 },
+            { open: 100, close: 100, high: 101, low: 100, timestamp: 3 },
+            { open: 100, close: 100, high: 101, low: 100, timestamp: 4 },
+            { open: 100, close: 120, high: 121, low: 100, timestamp: 5 },
+            { open: 120, close: 140, high: 141, low: 120, timestamp: 6 },
+        ];
+
+        const supplyResult = identifyZones(degenerateSupply);
+        const demandResult = identifyZones(degenerateDemand);
+
+        expect(supplyResult.supplyZones).toHaveLength(0);
+        expect(supplyResult.demandZones).toHaveLength(0);
+        expect(demandResult.supplyZones).toHaveLength(0);
+        expect(demandResult.demandZones).toHaveLength(0);
+    });
+
     it('identifies a drop-base-drop supply zone', () => {
         const candles = [
             bearishDecisive1(1), bearishDecisive2(2),

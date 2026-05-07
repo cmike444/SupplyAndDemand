@@ -37,6 +37,19 @@ describe('dropBaseRally', () => {
         expect(dropBaseRally(candles)).toBeNull();
     });
 
+    it('returns null when the zone would have zero width', () => {
+        const candles = [
+            { open: 120, close: 110, high: 121, low: 110, timestamp: 1 },
+            { open: 110, close: 100, high: 111, low: 100, timestamp: 2 },
+            { open: 100, close: 100, high: 101, low: 100, timestamp: 3 },
+            { open: 100, close: 100, high: 101, low: 100, timestamp: 4 },
+            { open: 100, close: 120, high: 121, low: 100, timestamp: 5 },
+            { open: 120, close: 140, high: 141, low: 120, timestamp: 6 },
+        ];
+
+        expect(dropBaseRally(candles)).toBeNull();
+    });
+
     it('returns a DemandZone for a valid drop-base-rally pattern', () => {
         const candles = [
             bearishDecisive1(1), bearishDecisive2(2),

@@ -5,6 +5,8 @@ import { rallyBaseDrop } from './rallyBaseDrop';
 import { dropBaseDrop } from './dropBaseDrop';
 import { dropBaseRally } from './dropBaseRally';
 import { rallyBaseRally } from './rallyBaseRally';
+import { hasValidZoneBounds } from './hasValidZoneBounds';
+import { ZONE_DIRECTION } from '../enums';
 
 /**
  * Identifies all supply and demand zones in a given array of candles.
@@ -38,6 +40,9 @@ import { rallyBaseRally } from './rallyBaseRally';
 export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; demandZones: DemandZone[] } {
     const supplyZones: SupplyZone[] = [];
     const demandZones: DemandZone[] = [];
+
+    const isValidZone = (proximalLine: number, distalLine: number, direction: ZONE_DIRECTION): boolean =>
+        hasValidZoneBounds(proximalLine, distalLine, direction);
 
     const globalMin = Math.min(...candles.map(c => c.low));
     const globalMax = Math.max(...candles.map(c => c.high));
@@ -90,7 +95,9 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
                 normalise(rallyBaseDropZone.proximalLine),
                 freshnessFactor(postZone, rallyBaseDropZone.proximalLine, true),
             );
-            supplyZones.push(rallyBaseDropZone);
+            if (isValidZone(rallyBaseDropZone.proximalLine, rallyBaseDropZone.distalLine, ZONE_DIRECTION.SUPPLY)) {
+                supplyZones.push(rallyBaseDropZone);
+            }
             if (endIdx !== -1) i += endIdx;
             continue;
         }
@@ -104,7 +111,9 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
                 normalise(dropBaseDropZone.proximalLine),
                 freshnessFactor(postZone, dropBaseDropZone.proximalLine, true),
             );
-            supplyZones.push(dropBaseDropZone);
+            if (isValidZone(dropBaseDropZone.proximalLine, dropBaseDropZone.distalLine, ZONE_DIRECTION.SUPPLY)) {
+                supplyZones.push(dropBaseDropZone);
+            }
             if (endIdx !== -1) i += endIdx;
             continue;
         }
@@ -118,7 +127,9 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
                 1 - normalise(dropBaseRallyZone.proximalLine),
                 freshnessFactor(postZone, dropBaseRallyZone.proximalLine, false),
             );
-            demandZones.push(dropBaseRallyZone);
+            if (isValidZone(dropBaseRallyZone.proximalLine, dropBaseRallyZone.distalLine, ZONE_DIRECTION.DEMAND)) {
+                demandZones.push(dropBaseRallyZone);
+            }
             if (endIdx !== -1) i += endIdx;
             continue;
         }
@@ -132,7 +143,9 @@ export function identifyZones(candles: Candle[]): { supplyZones: SupplyZone[]; d
                 1 - normalise(rallyBaseRallyZone.proximalLine),
                 freshnessFactor(postZone, rallyBaseRallyZone.proximalLine, false),
             );
-            demandZones.push(rallyBaseRallyZone);
+            if (isValidZone(rallyBaseRallyZone.proximalLine, rallyBaseRallyZone.distalLine, ZONE_DIRECTION.DEMAND)) {
+                demandZones.push(rallyBaseRallyZone);
+            }
             if (endIdx !== -1) i += endIdx;
             continue;
         }
